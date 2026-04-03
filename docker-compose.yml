@@ -10,8 +10,8 @@ services:
     volumes:
       - ./.mongodb-job:/data/db
     ports:
-      - ${DATABASE_PORT}:27019
-    command: ["mongod", "--port", "27019"]
+      - ${DATABASE_BIND_PORT}:${DATABASE_PORT}
+    command: ["mongod", "--port", "${DATABASE_PORT}"]
 
   api:
     depends_on:
@@ -25,13 +25,13 @@ services:
     env_file:
       - .env
     environment:
-      APPLICATION_PORT: 3002
+      APPLICATION_PORT: ${APPLICATION_PORT}
     restart: always
     volumes:
       - ./:/app
       - /app/node_modules
     ports:
-      - ${APPLICATION_PORT}:3002
+      - ${APPLICATION_BIND_PORT}:${APPLICATION_PORT}
 
 networks:
   job:
