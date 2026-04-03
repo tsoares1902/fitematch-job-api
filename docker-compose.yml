@@ -1,0 +1,38 @@
+services:
+  database:
+    networks:
+      - job
+    container_name: job-mongodb
+    image: mongo:latest
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./.mongodb-job:/data/db
+    ports:
+      - ${DATABASE_PORT}:27019
+    command: ["mongod", "--port", "27019"]
+
+  api:
+    depends_on:
+      - database
+    networks:
+      - job
+    container_name: job-api
+    build:
+      context: .
+    image: api
+    env_file:
+      - .env
+    environment:
+      APPLICATION_PORT: 3002
+    restart: always
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - ${APPLICATION_PORT}:3002
+
+networks:
+  job:
+    driver: bridge
