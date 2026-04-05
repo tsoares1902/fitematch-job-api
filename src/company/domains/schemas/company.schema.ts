@@ -28,7 +28,7 @@ export class CompanyEntity {
   logo?: string;
 
   @Prop({ required: true, trim: true })
-  logoAlt?: string;
+  cover?: string;
 
   @Prop({
     required: true,

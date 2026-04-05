@@ -7,7 +7,7 @@ export interface CompanyRecord {
   name: string;
   role: CompanyRoleEnum;
   logo?: string;
-  logoAlt?: string;
+  cover?: string;
   status: CompanyStatusEnum;
   createdAt?: Date;
   updatedAt?: Date;

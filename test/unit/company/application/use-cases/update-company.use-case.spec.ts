@@ -13,7 +13,7 @@ describe('UpdateCompanyUseCase', () => {
   const companyId = 'company-id';
   const updateInput: Partial<Company> = {
     name: 'Tecfit Updated',
-    logoAlt: 'Tecfit Updated',
+    cover: '/images/updated-cover.png',
     status: CompanyStatusEnum.INACTIVE,
   };
 
@@ -23,7 +23,7 @@ describe('UpdateCompanyUseCase', () => {
     name: 'Tecfit Updated',
     role: CompanyRoleEnum.MAIN,
     logo: '/images/logo.png',
-    logoAlt: 'Tecfit Updated',
+    cover: '/images/updated-cover.png',
     status: CompanyStatusEnum.INACTIVE,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-02T00:00:00.000Z'),

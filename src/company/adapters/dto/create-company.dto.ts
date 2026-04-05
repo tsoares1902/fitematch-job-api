@@ -41,12 +41,12 @@ export class CreateCompanyDto {
   @MaxLength(64)
   logo!: string;
 
-  @ApiProperty({ example: 'Tecfit', minLength: 2, maxLength: 255 })
+  @ApiProperty({ example: '/images/company-cover.png', minLength: 2, maxLength: 255 })
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(255)
-  logoAlt!: string;
+  cover!: string;
 
   @ApiProperty({
     example: CompanyStatusEnum.ACTIVE,

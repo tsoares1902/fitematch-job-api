@@ -19,7 +19,7 @@ export class CreateCompanyResponseDto {
   logo?: string;
 
   @ApiProperty()
-  logoAlt?: string;
+  cover?: string;
 
   @ApiProperty({ enum: CompanyStatusEnum })
   status!: CompanyStatusEnum;

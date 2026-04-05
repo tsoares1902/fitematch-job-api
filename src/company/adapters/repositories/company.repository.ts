@@ -101,7 +101,7 @@ export class CompanyRepository
       name: document.name,
       role: document.role,
       logo: document.logo,
-      logoAlt: document.logoAlt,
+      cover: document.cover,
       status: document.status,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
