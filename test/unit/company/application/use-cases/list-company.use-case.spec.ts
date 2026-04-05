@@ -1,0 +1,70 @@
+import { ListCompanyUseCase } from '@src/company/applications/use-cases/list-company.use-case';
+import type { ListCompanyRepositoryInterface } from '@src/company/applications/contracts/list-company.repository-interface';
+import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
+import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+
+describe('ListCompanyUseCase', () => {
+  let useCase: ListCompanyUseCase;
+  let repository: jest.Mocked<ListCompanyRepositoryInterface>;
+
+  const companies: CompanyRecord[] = [
+    {
+      id: 'company-1',
+      slug: 'tecfit',
+      name: 'Tecfit',
+      role: CompanyRoleEnum.MAIN,
+      logo: '/images/tecfit.png',
+      logoAlt: 'Tecfit',
+      status: CompanyStatusEnum.ACTIVE,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+    },
+    {
+      id: 'company-2',
+      slug: 'studio-fit',
+      name: 'Studio Fit',
+      role: CompanyRoleEnum.AFFILIATE,
+      logo: '/images/studio-fit.png',
+      logoAlt: 'Studio Fit',
+      status: CompanyStatusEnum.INACTIVE,
+      createdAt: new Date('2026-01-02T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    },
+  ];
+
+  beforeEach(() => {
+    repository = {
+      list: jest.fn(),
+    };
+
+    useCase = new ListCompanyUseCase(repository);
+  });
+
+  it('should list companies successfully', async () => {
+    repository.list.mockResolvedValue(companies);
+
+    const result = await useCase.execute();
+
+    expect(repository.list).toHaveBeenCalledTimes(1);
+    expect(repository.list).toHaveBeenCalledWith();
+    expect(result).toEqual(companies);
+  });
+
+  it('should return an empty list when there are no companies', async () => {
+    repository.list.mockResolvedValue([]);
+
+    const result = await useCase.execute();
+
+    expect(repository.list).toHaveBeenCalledTimes(1);
+    expect(result).toEqual([]);
+  });
+
+  it('should propagate repository exceptions', async () => {
+    const error = new Error('database unavailable');
+    repository.list.mockRejectedValue(error);
+
+    await expect(useCase.execute()).rejects.toThrow(error);
+    expect(repository.list).toHaveBeenCalledTimes(1);
+  });
+});

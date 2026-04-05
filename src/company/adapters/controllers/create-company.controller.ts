@@ -13,9 +13,7 @@ import {
   CREATE_COMPANY_USE_CASE,
   type CreateCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/create-company.use-case-interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
 
 @ApiTags('Company')
 @Controller('company')
@@ -42,13 +40,6 @@ export class CreateCompanyController {
   })
   @Post()
   async create(@Body() data: CreateCompanyDto): Promise<CompanyRecord> {
-    return this.createCompanyUseCase.execute({
-      slug: data.slug,
-      name: data.name,
-      role: data.role ?? CompanyRoleEnum.AFFILIATE,
-      logo: data.logo,
-      logoAlt: data.logoAlt,
-      status: data.status ?? CompanyStatusEnum.ACTIVE,
-    });
+    return this.createCompanyUseCase.execute(data);
   }
 }

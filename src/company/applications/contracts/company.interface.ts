@@ -4,8 +4,8 @@ import type { CompanyStatusEnum } from './company-status.enum';
 export interface Company {
   slug: string;
   name: string;
-  role: CompanyRoleEnum;
+  role?: CompanyRoleEnum;
   logo: string;
   logoAlt: string;
-  status: CompanyStatusEnum;
+  status?: CompanyStatusEnum;
 }
