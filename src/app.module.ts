@@ -3,10 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import apiConfig from '@src/config/api.config';
 import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from '@src/health-check/health-check.module';
-
-const importedModules = [HealthCheckModule];
+import { CompanyModule } from '@src/company/company.module';
 
 const databaseUri = process.env.DATABASE_URI;
+const importedModules = [HealthCheckModule, CompanyModule];
 @Module({
   imports: [
     ConfigModule.forRoot({
