@@ -55,6 +55,7 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
         slug: job.slug,
         title: job.title,
         slots: job.slots,
+        isPaidAdvertising: job.isPaidAdvertising,
         role: job.role,
         status: job.status,
         company,

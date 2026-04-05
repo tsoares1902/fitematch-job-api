@@ -24,11 +24,11 @@ export class CompanyEntity {
   })
   role!: CompanyRoleEnum;
 
-  @Prop({ required: true, trim: true })
-  logo?: string;
+  @Prop({ type: String, required: false, trim: true, default: null })
+  logo?: string | null;
 
-  @Prop({ required: true, trim: true })
-  cover?: string;
+  @Prop({ type: String, required: false, trim: true, default: null })
+  cover?: string | null;
 
   @Prop({
     required: true,

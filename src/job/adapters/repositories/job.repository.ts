@@ -97,6 +97,7 @@ export class JobRepository
       slug: document.slug,
       title: document.title,
       slots: document.slots,
+      isPaidAdvertising: document.isPaidAdvertising,
       role: document.role,
       status: document.status,
       createdAt: document.createdAt,

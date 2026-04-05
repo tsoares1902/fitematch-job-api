@@ -5,7 +5,7 @@ export interface Company {
   slug: string;
   name: string;
   role?: CompanyRoleEnum;
-  logo: string;
-  cover: string;
+  logo?: string | null;
+  cover?: string | null;
   status?: CompanyStatusEnum;
 }

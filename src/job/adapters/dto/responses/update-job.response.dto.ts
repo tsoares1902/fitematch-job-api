@@ -19,6 +19,9 @@ export class UpdateJobResponseDto {
   @ApiProperty()
   slots!: number;
 
+  @ApiProperty({ default: false })
+  isPaidAdvertising?: boolean;
+
   @ApiProperty({ enum: JobRoleEnum })
   role!: JobRoleEnum;
 

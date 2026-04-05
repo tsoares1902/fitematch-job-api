@@ -8,6 +8,7 @@ export interface Job {
   slug: string;
   title: string;
   slots: number;
+  isPaidAdvertising?: boolean;
   role: JobRoleEnum;
   status: JobStatusEnum;
   company: Company;

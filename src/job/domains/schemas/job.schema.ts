@@ -22,6 +22,9 @@ export class JobEntity {
   @Prop({ required: true, min: 1 })
   slots!: number;
 
+  @Prop({ type: Boolean, required: false, trim: true, default: false })
+  isPaidAdvertising?: boolean;
+
   @Prop({
     required: true,
     enum: JobRoleEnum,

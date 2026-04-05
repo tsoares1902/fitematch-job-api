@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   Min,
@@ -35,6 +37,11 @@ export class CreateJobDto {
   @IsInt()
   @Min(1)
   slots!: number;
+
+  @ApiProperty({ example: false, required: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isPaidAdvertising?: boolean;
 
   @ApiProperty({ example: JobRoleEnum.INTERN, enum: JobRoleEnum })
   @IsEnum(JobRoleEnum)

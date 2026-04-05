@@ -34,19 +34,33 @@ export class CreateCompanyDto {
   @IsEnum(CompanyRoleEnum)
   role?: CompanyRoleEnum;
 
-  @ApiProperty({ example: '/images/logo.png', minLength: 2, maxLength: 64 })
+  @ApiProperty({
+    example: '/images/logo.png',
+    minLength: 2,
+    maxLength: 64,
+    required: false,
+    nullable: true,
+  })
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(64)
-  logo!: string;
+  logo?: string | null;
 
-  @ApiProperty({ example: '/images/company-cover.png', minLength: 2, maxLength: 255 })
+  @ApiProperty({
+    example: '/images/company-cover.png',
+    minLength: 2,
+    maxLength: 255,
+    required: false,
+    nullable: true,
+  })
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(255)
-  cover!: string;
+  cover?: string | null;
 
   @ApiProperty({
     example: CompanyStatusEnum.ACTIVE,

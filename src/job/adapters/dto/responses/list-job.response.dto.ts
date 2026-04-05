@@ -19,6 +19,9 @@ export class ListJobResponseDto {
   @ApiProperty()
   slots!: number;
 
+  @ApiProperty({ default: false })
+  isPaidAdvertising?: boolean;
+
   @ApiProperty({ enum: JobRoleEnum })
   role!: JobRoleEnum;
 
