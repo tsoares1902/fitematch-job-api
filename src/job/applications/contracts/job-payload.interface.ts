@@ -7,6 +7,7 @@ export interface JobPayload {
   slug: string;
   title: string;
   slots: number;
+  cover: string;
   benefits: JobBenefits;
   isPaidAdvertising?: boolean;
   role: JobRoleEnum;

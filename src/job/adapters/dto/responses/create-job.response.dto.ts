@@ -20,6 +20,9 @@ export class CreateJobResponseDto {
   @ApiProperty()
   slots!: number;
 
+  @ApiProperty()
+  cover!: string;
+
   @ApiProperty({ type: JobBenefitsResponseDto })
   benefits!: JobBenefitsResponseDto;
 

@@ -39,6 +39,7 @@ export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
       slug: job.slug,
       title: job.title,
       slots: job.slots,
+      cover: job.cover,
       benefits: job.benefits,
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,

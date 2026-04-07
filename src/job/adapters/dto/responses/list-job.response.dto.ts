@@ -11,6 +11,9 @@ export class ListJobResponseDto {
   @ApiProperty()
   companyId!: string;
 
+  @ApiProperty({ default: false })
+  isPaidAdvertising?: boolean;
+
   @ApiProperty()
   slug!: string;
 
@@ -20,11 +23,11 @@ export class ListJobResponseDto {
   @ApiProperty()
   slots!: number;
 
+  @ApiProperty()
+  cover!: string;
+
   @ApiProperty({ type: JobBenefitsResponseDto })
   benefits!: JobBenefitsResponseDto;
-
-  @ApiProperty({ default: false })
-  isPaidAdvertising?: boolean;
 
   @ApiProperty({ enum: JobRoleEnum })
   role!: JobRoleEnum;

@@ -22,8 +22,8 @@ export interface Company {
   name: string;
   address: CompanyAddress;
   social: CompanySocial;
-  role?: CompanyRoleEnum;
   logo?: string | null;
+  role?: CompanyRoleEnum;
   cover?: string | null;
   status?: CompanyStatusEnum;
 }

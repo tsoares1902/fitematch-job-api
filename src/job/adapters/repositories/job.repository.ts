@@ -7,7 +7,11 @@ import type {
   UpdateJobPayload,
 } from '@src/job/applications/contracts/job-payload.interface';
 import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
-import type { ListJobRepositoryInterface } from '@src/job/applications/contracts/list-job.repository-interface';
+import type {
+  ListJobRepositoryInterface,
+  ListJobRepositoryResult,
+} from '@src/job/applications/contracts/list-job.repository-interface';
+import type { ListJobsQueryInterface } from '@src/job/applications/contracts/list-job-query.interface';
 import type { ReadJobRepositoryInterface } from '@src/job/applications/contracts/read-job.repository-interface';
 import type { UpdateJobRepositoryInterface } from '@src/job/applications/contracts/update-job.repository-interface';
 import {
@@ -41,10 +45,45 @@ export class JobRepository
     }
   }
 
-  async list(): Promise<JobRecord[]> {
-    const jobs = await this.jobModel.find().exec();
+  async list(filters: ListJobsQueryInterface): Promise<ListJobRepositoryResult> {
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+    const currentPage = page > 0 ? page : 1;
+    const itemsPerPage = limit > 0 ? limit : 10;
 
-    return jobs.map((job) => this.toRecord(job));
+    const query = {
+      ...(filters.id && { _id: filters.id }),
+      ...(filters.companyId && { companyId: filters.companyId }),
+      ...(filters.isPaidAdvertising !== undefined && {
+        isPaidAdvertising: filters.isPaidAdvertising,
+      }),
+      ...(filters.slug && { slug: { $regex: filters.slug, $options: 'i' } }),
+      ...(filters.title && { title: { $regex: filters.title, $options: 'i' } }),
+      ...(filters.slots !== undefined && { slots: filters.slots }),
+      ...(filters.cover && { cover: { $regex: filters.cover, $options: 'i' } }),
+      ...(filters.role && { role: filters.role }),
+      ...(filters.status && { status: filters.status }),
+    };
+
+    const sortBy = filters.sortBy ?? 'createdAt';
+    const sortOrder = filters.sortOrder === 'asc' ? 1 : -1;
+
+    const [jobs, totalItems] = await Promise.all([
+      this.jobModel
+        .find(query)
+        .sort({ [sortBy]: sortOrder })
+        .skip((currentPage - 1) * itemsPerPage)
+        .limit(itemsPerPage)
+        .exec(),
+      this.jobModel.countDocuments(query).exec(),
+    ]);
+
+    return {
+      data: jobs.map((job) => this.toRecord(job)),
+      totalItems,
+      currentPage,
+      itemsPerPage,
+    };
   }
 
   async findById(id: string): Promise<JobRecord | null> {
@@ -106,6 +145,7 @@ export class JobRepository
       slug: document.slug,
       title: document.title,
       slots: document.slots,
+      cover: document.cover,
       benefits: {
         salary: document.benefits.salary ?? null,
         transportation: document.benefits.transportation,

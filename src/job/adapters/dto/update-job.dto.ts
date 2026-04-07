@@ -52,6 +52,18 @@ export class UpdateJobDto {
   @Min(1)
   slots?: number;
 
+  @ApiProperty({
+    example: '/images/job-cover.png',
+    minLength: 1,
+    maxLength: 255,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  cover?: string;
+
   @ApiProperty({ type: UpdateJobBenefitsDto, required: false })
   @IsOptional()
   @IsObject()

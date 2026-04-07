@@ -1,7 +1,10 @@
-import type { ListJobResponseDto } from '@src/job/adapters/dto/responses/list-job.response.dto';
+import type ListJobsUseCaseInterface from '@src/job/applications/contracts/result-list-job.use-case.interface';
+import type {
+  DataListJobsUseCaseInterface,
+  ResultListJobUseCaseInterface,
+} from '@src/job/applications/contracts/result-list-job.use-case.interface';
 
-export const LIST_JOB_USE_CASE = 'LIST_JOB_USE_CASE';
+export const LIST_JOB_USE_CASE_INTERFACE = 'LIST_JOB_USE_CASE_INTERFACE';
 
-export interface ListJobUseCaseInterface {
-  execute(): Promise<ListJobResponseDto[]>;
-}
+export type { DataListJobsUseCaseInterface, ResultListJobUseCaseInterface };
+export type ListJobUseCaseInterface = ListJobsUseCaseInterface;

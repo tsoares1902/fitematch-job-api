@@ -22,6 +22,9 @@ export class JobEntity {
   @Prop({ required: true, min: 1 })
   slots!: number;
 
+  @Prop({ required: true, trim: true })
+  cover!: string;
+
   @Prop({
     type: {
       salary: { type: Number, required: false, default: null, min: 0 },

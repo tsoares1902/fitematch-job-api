@@ -37,6 +37,7 @@ export class CreateJobUseCase implements CreateJobUseCaseInterface {
       slug: job.slug,
       title: job.title,
       slots: job.slots,
+      cover: job.cover,
       benefits: job.benefits,
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,

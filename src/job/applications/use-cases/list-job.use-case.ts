@@ -5,27 +5,35 @@ import {
 } from '@src/company/applications/contracts/list-company.repository-interface';
 import type { ReadCompanyResponseDto } from '@src/company/adapters/dto/responses/read-company.response.dto';
 import {
-  LIST_JOB_REPOSITORY,
+  LIST_JOB_REPOSITORY_INTERFACE,
   type ListJobRepositoryInterface,
 } from '@src/job/applications/contracts/list-job.repository-interface';
 import type { ListJobUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
+import type { DataListJobsUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
+import type { ResultListJobUseCaseInterface } from '@src/job/applications/contracts/result-list-job.use-case.interface';
 import type { ListJobResponseDto } from '@src/job/adapters/dto/responses/list-job.response.dto';
 import MasksUtils from '@src/shared/applications/utils/masks.utils';
+import MetadataUtils from '@src/shared/applications/utils/metadata.utils';
+import ResultPaginationInterface from '@src/shared/applications/contracts/result-pagination.interface';
 
 @Injectable()
 export class ListJobUseCase implements ListJobUseCaseInterface {
   constructor(
-    @Inject(LIST_JOB_REPOSITORY)
+    @Inject(LIST_JOB_REPOSITORY_INTERFACE)
     private readonly listJobRepository: ListJobRepositoryInterface,
     @Inject(LIST_COMPANY_REPOSITORY)
     private readonly listCompanyRepository: ListCompanyRepositoryInterface,
+    private readonly metadataUtils: MetadataUtils,
   ) {}
 
-  async execute(): Promise<ListJobResponseDto[]> {
-    const [jobs, companies] = await Promise.all([
-      this.listJobRepository.list(),
+  async execute(
+    filters: DataListJobsUseCaseInterface,
+  ): Promise<ResultListJobUseCaseInterface> {
+    const [{ data: jobs, totalItems, currentPage, itemsPerPage }, companies] =
+      await Promise.all([
+        this.listJobRepository.list(filters),
       this.listCompanyRepository.list(),
-    ]);
+      ]);
 
     const companiesById = new Map<string, ReadCompanyResponseDto>(
       companies.map((company) => [
@@ -46,7 +54,7 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
       ]),
     );
 
-    return jobs.map((job) => {
+    const data = jobs.map((job): ListJobResponseDto => {
       const company = companiesById.get(job.companyId);
 
       if (!company) {
@@ -58,9 +66,11 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
       return {
         id: job.id,
         companyId: job.companyId,
+        isPaidAdvertising: job.isPaidAdvertising,
         slug: job.slug,
         title: job.title,
         slots: job.slots,
+        cover: job.cover,
         benefits: {
           ...job.benefits,
           salary:
@@ -70,13 +80,54 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
                   String(job.benefits.salary),
                 ),
         },
-        isPaidAdvertising: job.isPaidAdvertising,
+        company,
         role: job.role,
         status: job.status,
-        company,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       };
     });
+
+    if (data.length <= 0) {
+      return {
+        data: [],
+        metadata: {
+          pagination: this.getEmptyMetadata(filters),
+        },
+      };
+    }
+
+    return {
+      data,
+      metadata: {
+        pagination: this.metadataUtils.getDadosPaginacao(
+          totalItems,
+          data.length,
+          itemsPerPage,
+          currentPage,
+          filters.route,
+        ),
+      },
+    };
+  }
+
+  private getEmptyMetadata(
+    filters: DataListJobsUseCaseInterface,
+  ): ResultPaginationInterface {
+    return {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: Number(filters.limit || 10),
+      totalPages: 0,
+      currentPage: Number(filters.page || 1),
+      hasNextPage: false,
+      hasPreviousPage: false,
+      links: {
+        first: filters.route,
+        previous: '',
+        next: '',
+        last: '',
+      },
+    };
   }
 }
