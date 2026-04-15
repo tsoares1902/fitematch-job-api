@@ -1,41 +1,17 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  LIST_COMPANY_REPOSITORY_INTERFACE,
-  type ListCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/list-company.repository-interface';
-import type { ReadCompanyResponseDto } from '@src/company/adapters/dto/responses/read-company.response.dto';
-import {
-  LIST_JOB_REPOSITORY_INTERFACE,
-  type ListJobRepositoryInterface,
-} from '@src/job/applications/contracts/list-job.repository-interface';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
+import { type ListJobRepositoryInterface } from '@src/job/applications/contracts/list-job.repository-interface';
 import type { ListJobUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
 import type { DataListJobsUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
-import type { ResultListJobUseCaseInterface } from '@src/job/applications/contracts/result-list-job.use-case.interface';
-import type { ListJobResponseDto } from '@src/job/adapters/dto/responses/list-job.response.dto';
-import MasksUtils from '@src/shared/applications/utils/masks.utils';
-import MetadataUtils from '@src/shared/applications/utils/metadata.utils';
-import ResultPaginationInterface from '@src/shared/applications/contracts/result-pagination.interface';
+import type { ResultListJobUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
+import type { JobCompanyOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class ListJobUseCase implements ListJobUseCaseInterface {
-  private readonly listJobRepository: ListJobRepositoryInterface;
-
-  private readonly listCompanyRepository: ListCompanyRepositoryInterface;
-
-  private readonly metadataUtils: MetadataUtils;
-
   constructor(
-    @Inject(LIST_JOB_REPOSITORY_INTERFACE)
-    listJobRepository: ListJobRepositoryInterface,
-    @Inject(LIST_COMPANY_REPOSITORY_INTERFACE)
-    listCompanyRepository: ListCompanyRepositoryInterface,
-    /* c8 ignore next */
-    metadataUtils: MetadataUtils,
-  ) {
-    this.listJobRepository = listJobRepository;
-    this.listCompanyRepository = listCompanyRepository;
-    this.metadataUtils = metadataUtils;
-  }
+    private readonly listJobRepository: ListJobRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
+  ) {}
 
   async execute(
     filters: DataListJobsUseCaseInterface,
@@ -43,10 +19,10 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
     const [{ data: jobs, totalItems, currentPage, itemsPerPage }, companies] =
       await Promise.all([
         this.listJobRepository.list(filters),
-        this.listCompanyRepository.list(),
+        this.companyReader.list(),
       ]);
 
-    const companiesById = new Map<string, ReadCompanyResponseDto>(
+    const companiesById = new Map<string, JobCompanyOutput>(
       companies.map((company) => [
         company.id,
         {
@@ -54,10 +30,10 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
           slug: company.slug,
           name: company.name,
           address: company.address,
-          social: company.social ?? {},
+          social: company.social,
           role: company.role,
-          logo: company.logo ?? '',
-          cover: company.cover ?? '',
+          logo: company.logo,
+          cover: company.cover,
           status: company.status,
           createdAt: company.createdAt,
           updatedAt: company.updatedAt,
@@ -65,11 +41,12 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
       ]),
     );
 
-    const data = jobs.map((job): ListJobResponseDto => {
+    const data = jobs.map((job) => {
       const company = companiesById.get(job.companyId);
+      const jobEntity = JobEntity.fromRecord(job);
 
       if (!company) {
-        throw new NotFoundException(
+        throw new NotFoundApplicationError(
           `Company not found for job ${job.id} and companyId ${job.companyId}`,
         );
       }
@@ -82,15 +59,7 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
         title: job.title,
         slots: job.slots,
         cover: job.cover,
-        benefits: {
-          ...job.benefits,
-          salary:
-            job.benefits.salary === null || job.benefits.salary === undefined
-              ? null
-              : MasksUtils.applyBrazilianSalaryMask(
-                  String(job.benefits.salary),
-                ),
-        },
+        benefits: jobEntity.getBenefits(),
         company,
         role: job.role,
         status: job.status,
@@ -102,29 +71,27 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
     if (data.length <= 0) {
       return {
         data: [],
-        metadata: {
-          pagination: this.getEmptyMetadata(filters),
-        },
+        pagination: this.getEmptyPagination(filters),
       };
     }
 
     return {
       data,
-      metadata: {
-        pagination: this.metadataUtils.getDadosPaginacao(
-          totalItems,
-          data.length,
-          itemsPerPage,
-          currentPage,
-          filters.route,
-        ),
+      pagination: {
+        totalItems,
+        itemCount: data.length,
+        itemsPerPage,
+        totalPages: Math.ceil(totalItems / itemsPerPage),
+        currentPage,
+        hasNextPage: currentPage < Math.ceil(totalItems / itemsPerPage),
+        hasPreviousPage: currentPage > 1,
       },
     };
   }
 
-  private getEmptyMetadata(
+  private getEmptyPagination(
     filters: DataListJobsUseCaseInterface,
-  ): ResultPaginationInterface {
+  ): ResultListJobUseCaseInterface['pagination'] {
     return {
       totalItems: 0,
       itemCount: 0,
@@ -133,12 +100,6 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
       currentPage: Number(filters.page || 1),
       hasNextPage: false,
       hasPreviousPage: false,
-      links: {
-        first: filters.route,
-        previous: '',
-        next: '',
-        last: '',
-      },
     };
   }
 }

@@ -1,34 +1,32 @@
-import type { ListCompanyRepositoryInterface } from '@src/company/applications/contracts/list-company.repository-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import type {
+  CompanyReaderPort,
+  JobCompanySnapshot,
+} from '@src/job/applications/contracts/company-reader.port';
 import type {
   ListJobRepositoryInterface,
   ListJobRepositoryResult,
 } from '@src/job/applications/contracts/list-job.repository-interface';
 import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
+import type {
+  ResultListJobUseCaseInterface,
+  DataListJobsUseCaseInterface,
+} from '@src/job/applications/contracts/list-job.use-case-interface';
 import { ListJobUseCase } from '@src/job/applications/use-cases/list-job.use-case';
-import type { ResultListJobUseCaseInterface } from '@src/job/applications/contracts/result-list-job.use-case.interface';
-import type { DataListJobsUseCaseInterface } from '@src/job/applications/contracts/list-job.use-case-interface';
-import type MetadataUtils from '@src/shared/applications/utils/metadata.utils';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('ListJobUseCase', () => {
   let useCase: ListJobUseCase;
   let repository: {
     list: jest.MockedFunction<ListJobRepositoryInterface['list']>;
   };
-  let companyRepository: {
-    list: jest.MockedFunction<ListCompanyRepositoryInterface['list']>;
-  };
-  let metadataUtils: {
-    getDadosPaginacao: jest.MockedFunction<MetadataUtils['getDadosPaginacao']>;
+  let companyReader: {
+    list: jest.MockedFunction<CompanyReaderPort['list']>;
+    findById: jest.MockedFunction<CompanyReaderPort['findById']>;
   };
 
-  const filters: DataListJobsUseCaseInterface = {
-    route: '/jobs',
-  };
+  const filters: DataListJobsUseCaseInterface = {};
 
   const firstJobBenefits = {
     salary: 2500,
@@ -79,7 +77,7 @@ describe('ListJobUseCase', () => {
     },
   ];
 
-  const companies: CompanyRecord[] = [
+  const companies: JobCompanySnapshot[] = [
     {
       id: 'company-1',
       slug: 'tecfit',
@@ -98,10 +96,10 @@ describe('ListJobUseCase', () => {
         linkedin: 'https://linkedin.com/company/tecfit',
         twitter: 'https://x.com/tecfit',
       },
-      role: CompanyRoleEnum.MAIN,
+      role: 'main',
       logo: '/images/tecfit.png',
       cover: '/images/tecfit-cover.png',
-      status: CompanyStatusEnum.ACTIVE,
+      status: 'active',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     },
@@ -123,10 +121,10 @@ describe('ListJobUseCase', () => {
         linkedin: 'https://linkedin.com/company/studiofit',
         twitter: 'https://x.com/studiofit',
       },
-      role: CompanyRoleEnum.AFFILIATE,
+      role: 'affiliate',
       logo: '/images/studio-fit.png',
       cover: '/images/studio-fit-cover.png',
-      status: CompanyStatusEnum.INACTIVE,
+      status: 'inactive',
       createdAt: new Date('2026-01-02T00:00:00.000Z'),
       updatedAt: new Date('2026-01-02T00:00:00.000Z'),
     },
@@ -139,7 +137,7 @@ describe('ListJobUseCase', () => {
     itemsPerPage: 10,
   };
 
-  const paginationMetadata = {
+  const pagination = {
     totalItems: 2,
     itemCount: 2,
     itemsPerPage: 10,
@@ -147,12 +145,6 @@ describe('ListJobUseCase', () => {
     currentPage: 1,
     hasNextPage: false,
     hasPreviousPage: false,
-    links: {
-      first: '/jobs?limit=10',
-      previous: '',
-      next: '',
-      last: '/jobs?page=1&limit=10',
-    },
   };
 
   const expectedResult: ResultListJobUseCaseInterface = {
@@ -161,7 +153,7 @@ describe('ListJobUseCase', () => {
         ...jobs[0],
         benefits: {
           ...jobs[0].benefits,
-          salary: 'R$\u00A02.500,00',
+          salary: 2500,
         },
         company: {
           id: 'company-1',
@@ -169,10 +161,10 @@ describe('ListJobUseCase', () => {
           name: 'Tecfit',
           address: companies[0].address,
           social: companies[0].social,
-          role: CompanyRoleEnum.MAIN,
+          role: 'main',
           logo: '/images/tecfit.png',
           cover: '/images/tecfit-cover.png',
-          status: CompanyStatusEnum.ACTIVE,
+          status: 'active',
           createdAt: companies[0].createdAt,
           updatedAt: companies[0].updatedAt,
         },
@@ -181,7 +173,7 @@ describe('ListJobUseCase', () => {
         ...jobs[1],
         benefits: {
           ...jobs[1].benefits,
-          salary: 'R$\u00A00,00',
+          salary: 0,
         },
         company: {
           id: 'company-2',
@@ -189,46 +181,38 @@ describe('ListJobUseCase', () => {
           name: 'Studio Fit',
           address: companies[1].address,
           social: companies[1].social,
-          role: CompanyRoleEnum.AFFILIATE,
+          role: 'affiliate',
           logo: '/images/studio-fit.png',
           cover: '/images/studio-fit-cover.png',
-          status: CompanyStatusEnum.INACTIVE,
+          status: 'inactive',
           createdAt: companies[1].createdAt,
           updatedAt: companies[1].updatedAt,
         },
       },
     ],
-    metadata: {
-      pagination: paginationMetadata,
-    },
+    pagination,
   };
 
   beforeEach(() => {
     repository = {
       list: jest.fn(),
     };
-    companyRepository = {
+    companyReader = {
       list: jest.fn(),
+      findById: jest.fn(),
     };
-    metadataUtils = {
-      getDadosPaginacao: jest.fn().mockReturnValue(paginationMetadata),
-    };
-
-    useCase = new ListJobUseCase(repository, companyRepository, metadataUtils);
+    useCase = new ListJobUseCase(repository, companyReader);
   });
 
   describe('execute', () => {
     it('should list jobs successfully', async () => {
       repository.list.mockResolvedValue(repositoryResult);
-      companyRepository.list.mockResolvedValue(companies);
+      companyReader.list.mockResolvedValue(companies);
 
       const result = await useCase.execute(filters);
 
       expect(repository.list.mock.calls).toEqual([[filters]]);
-      expect(companyRepository.list.mock.calls).toEqual([[]]);
-      expect(metadataUtils.getDadosPaginacao.mock.calls).toEqual([
-        [2, 2, 10, 1, '/jobs'],
-      ]);
+      expect(companyReader.list.mock.calls).toEqual([[]]);
       expect(result).toEqual(expectedResult);
     });
 
@@ -247,12 +231,12 @@ describe('ListJobUseCase', () => {
         currentPage: 1,
         itemsPerPage: 10,
       });
-      companyRepository.list.mockResolvedValue([
+      companyReader.list.mockResolvedValue([
         {
           ...companies[0],
-          social: {} as CompanyRecord['social'],
-          logo: undefined,
-          cover: undefined,
+          social: {},
+          logo: '',
+          cover: '',
         },
       ]);
 
@@ -279,7 +263,7 @@ describe('ListJobUseCase', () => {
         currentPage: 1,
         itemsPerPage: 10,
       });
-      companyRepository.list.mockResolvedValue([companies[0]]);
+      companyReader.list.mockResolvedValue([companies[0]]);
 
       const result = await useCase.execute(filters);
 
@@ -293,30 +277,21 @@ describe('ListJobUseCase', () => {
         currentPage: 1,
         itemsPerPage: 10,
       });
-      companyRepository.list.mockResolvedValue(companies);
+      companyReader.list.mockResolvedValue(companies);
 
       const result = await useCase.execute(filters);
 
       expect(repository.list.mock.calls).toEqual([[filters]]);
-      expect(metadataUtils.getDadosPaginacao.mock.calls).toEqual([]);
       expect(result).toEqual({
         data: [],
-        metadata: {
-          pagination: {
-            totalItems: 0,
-            itemCount: 0,
-            itemsPerPage: 10,
-            totalPages: 0,
-            currentPage: 1,
-            hasNextPage: false,
-            hasPreviousPage: false,
-            links: {
-              first: '/jobs',
-              previous: '',
-              next: '',
-              last: '',
-            },
-          },
+        pagination: {
+          totalItems: 0,
+          itemCount: 0,
+          itemsPerPage: 10,
+          totalPages: 0,
+          currentPage: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
       });
     });
@@ -328,15 +303,14 @@ describe('ListJobUseCase', () => {
         currentPage: 3,
         itemsPerPage: 25,
       });
-      companyRepository.list.mockResolvedValue(companies);
+      companyReader.list.mockResolvedValue(companies);
 
       const result = await useCase.execute({
-        route: '/jobs',
         page: 3,
         limit: 25,
       });
 
-      expect(result.metadata.pagination).toEqual({
+      expect(result.pagination).toEqual({
         totalItems: 0,
         itemCount: 0,
         itemsPerPage: 25,
@@ -344,28 +318,24 @@ describe('ListJobUseCase', () => {
         currentPage: 3,
         hasNextPage: false,
         hasPreviousPage: false,
-        links: {
-          first: '/jobs',
-          previous: '',
-          next: '',
-          last: '',
-        },
       });
     });
 
-    it('should throw NotFoundException when a company for a job is missing', async () => {
+    it('should throw NotFoundApplicationError when a company for a job is missing', async () => {
       repository.list.mockResolvedValue({
         data: [jobs[0]],
         totalItems: 1,
         currentPage: 1,
         itemsPerPage: 10,
       });
-      companyRepository.list.mockResolvedValue([]);
+      companyReader.list.mockResolvedValue([]);
 
+      await expect(useCase.execute(filters)).rejects.toThrow(
+        NotFoundApplicationError,
+      );
       await expect(useCase.execute(filters)).rejects.toThrow(
         `Company not found for job ${jobs[0].id} and companyId ${jobs[0].companyId}`,
       );
-      expect(metadataUtils.getDadosPaginacao.mock.calls).toEqual([]);
     });
 
     it('should propagate repository exceptions', async () => {

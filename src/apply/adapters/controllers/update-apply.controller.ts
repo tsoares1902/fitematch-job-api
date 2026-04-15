@@ -10,11 +10,11 @@ import {
 } from '@nestjs/swagger';
 import { UpdateApplyDto } from '@src/apply/adapters/dto/update-apply.dto';
 import { UpdateApplyResponseDto } from '@src/apply/adapters/dto/responses/update-apply.response.dto';
-import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
   UPDATE_APPLY_USE_CASE_INTERFACE,
   type UpdateApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/update-apply.use-case-interface';
+import { ApplyResponseMapper } from '@src/apply/adapters/controllers/responses/apply-response.mapper';
 
 @ApiTags('Apply')
 @Controller('apply')
@@ -22,6 +22,7 @@ export class UpdateApplyController {
   constructor(
     @Inject(UPDATE_APPLY_USE_CASE_INTERFACE)
     private readonly updateApplyUseCase: UpdateApplyUseCaseInterface,
+    private readonly applyResponseMapper: ApplyResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -44,7 +45,9 @@ export class UpdateApplyController {
   async update(
     @Param('id') id: string,
     @Body() data: UpdateApplyDto,
-  ): Promise<ApplyRecord> {
-    return this.updateApplyUseCase.execute(id, data);
+  ): Promise<UpdateApplyResponseDto> {
+    return this.applyResponseMapper.toResponse(
+      await this.updateApplyUseCase.execute(id, data),
+    );
   }
 }

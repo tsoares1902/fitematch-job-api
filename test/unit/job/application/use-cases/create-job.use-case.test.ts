@@ -1,22 +1,24 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
-import type { ReadCompanyRepositoryInterface } from '@src/company/applications/contracts/read-company.repository-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import type {
+  CompanyReaderPort,
+  JobCompanySnapshot,
+} from '@src/job/applications/contracts/company-reader.port';
 import type { CreateJobRepositoryInterface } from '@src/job/applications/contracts/create-job.repository-interface';
 import type { JobPayload } from '@src/job/applications/contracts/job-payload.interface';
 import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 import { CreateJobUseCase } from '@src/job/applications/use-cases/create-job.use-case';
+import { ConflictApplicationError } from '@src/shared/application/errors/conflict.application-error';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('CreateJobUseCase', () => {
   let useCase: CreateJobUseCase;
   let repository: {
     create: jest.MockedFunction<CreateJobRepositoryInterface['create']>;
   };
-  let companyRepository: {
-    findById: jest.MockedFunction<ReadCompanyRepositoryInterface['findById']>;
+  let companyReader: {
+    findById: jest.MockedFunction<CompanyReaderPort['findById']>;
+    list: jest.MockedFunction<CompanyReaderPort['list']>;
   };
 
   const companyId = 'company-id';
@@ -46,7 +48,7 @@ describe('CreateJobUseCase', () => {
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };
 
-  const companyRecord: CompanyRecord = {
+  const companyRecord: JobCompanySnapshot = {
     id: companyId,
     slug: 'tecfit',
     name: 'Tecfit',
@@ -64,10 +66,10 @@ describe('CreateJobUseCase', () => {
       linkedin: 'https://linkedin.com/company/tecfit',
       twitter: 'https://x.com/tecfit',
     },
-    role: CompanyRoleEnum.MAIN,
+    role: 'main',
     logo: '/images/logo.png',
     cover: '/images/cover.png',
-    status: CompanyStatusEnum.ACTIVE,
+    status: 'active',
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };
@@ -76,25 +78,27 @@ describe('CreateJobUseCase', () => {
     repository = {
       create: jest.fn(),
     };
-    companyRepository = {
+    companyReader = {
       findById: jest.fn(),
+      list: jest.fn(),
     };
 
-    useCase = new CreateJobUseCase(repository, companyRepository);
+    useCase = new CreateJobUseCase(repository, companyReader);
   });
 
   describe('execute', () => {
     it('should create a job successfully', async () => {
       repository.create.mockResolvedValue(jobRecord);
-      companyRepository.findById.mockResolvedValue(companyRecord);
+      companyReader.findById.mockResolvedValue(companyRecord);
 
       const result = await useCase.execute(jobInput);
 
       expect(repository.create.mock.calls).toEqual([[jobInput]]);
-      expect(companyRepository.findById.mock.calls).toEqual([[companyId]]);
+      expect(companyReader.findById.mock.calls).toEqual([[companyId]]);
       expect(result).toEqual({
         ...jobRecord,
         company: {
+          id: companyRecord.id,
           slug: companyRecord.slug,
           name: companyRecord.name,
           address: companyRecord.address,
@@ -103,6 +107,8 @@ describe('CreateJobUseCase', () => {
           logo: companyRecord.logo,
           cover: companyRecord.cover,
           status: companyRecord.status,
+          createdAt: companyRecord.createdAt,
+          updatedAt: companyRecord.updatedAt,
         },
       });
     });
@@ -112,11 +118,11 @@ describe('CreateJobUseCase', () => {
         ...jobRecord,
         isPaidAdvertising: undefined,
       });
-      companyRepository.findById.mockResolvedValue({
+      companyReader.findById.mockResolvedValue({
         ...companyRecord,
-        social: {} as CompanyRecord['social'],
-        logo: undefined,
-        cover: undefined,
+        social: {},
+        logo: '',
+        cover: '',
       });
 
       const result = await useCase.execute(jobInput);
@@ -138,25 +144,25 @@ describe('CreateJobUseCase', () => {
         ...jobRecord,
         ...customJobInput,
       });
-      companyRepository.findById.mockResolvedValue(companyRecord);
+      companyReader.findById.mockResolvedValue(companyRecord);
 
       await useCase.execute(customJobInput);
 
       expect(repository.create.mock.calls).toEqual([[customJobInput]]);
     });
 
-    it('should throw NotFoundException when the company does not exist', async () => {
+    it('should throw NotFoundApplicationError when the company does not exist', async () => {
       repository.create.mockResolvedValue(jobRecord);
-      companyRepository.findById.mockResolvedValue(null);
+      companyReader.findById.mockResolvedValue(null);
+      const execution = useCase.execute(jobInput);
 
-      await expect(useCase.execute(jobInput)).rejects.toThrow(
-        new NotFoundException('Company not found!'),
-      );
-      expect(companyRepository.findById.mock.calls).toEqual([[companyId]]);
+      await expect(execution).rejects.toThrow(NotFoundApplicationError);
+      await expect(execution).rejects.toThrow('Company not found!');
+      expect(companyReader.findById.mock.calls).toEqual([[companyId]]);
     });
 
     it('should propagate repository exceptions', async () => {
-      const error = new ConflictException('slug already exists');
+      const error = new ConflictApplicationError('slug already exists');
       repository.create.mockRejectedValue(error);
 
       await expect(useCase.execute(jobInput)).rejects.toThrow(error);

@@ -11,7 +11,7 @@ import {
   READ_COMPANY_USE_CASE_INTERFACE,
   type ReadCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/read-company.use-case-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { CompanyResponseMapper } from '@src/company/adapters/controllers/responses/company-response.mapper';
 
 @ApiTags('Company')
 @Controller('company')
@@ -19,6 +19,7 @@ export class ReadCompanyController {
   constructor(
     @Inject(READ_COMPANY_USE_CASE_INTERFACE)
     private readonly readCompanyUseCase: ReadCompanyUseCaseInterface,
+    private readonly companyResponseMapper: CompanyResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -34,7 +35,9 @@ export class ReadCompanyController {
     description: 'Company not found!',
   })
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<CompanyRecord> {
-    return this.readCompanyUseCase.execute(id);
+  async getById(@Param('id') id: string): Promise<ReadCompanyResponseDto> {
+    return this.companyResponseMapper.toResponse(
+      await this.readCompanyUseCase.execute(id),
+    );
   }
 }

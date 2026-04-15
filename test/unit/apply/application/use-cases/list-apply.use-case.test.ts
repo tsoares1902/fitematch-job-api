@@ -1,6 +1,6 @@
 import type { ListApplyRepositoryInterface } from '@src/apply/applications/contracts/list-apply.repository-interface';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 import { ListApplyUseCase } from '@src/apply/applications/use-cases/list-apply.use-case';
 
 describe('ListApplyUseCase', () => {

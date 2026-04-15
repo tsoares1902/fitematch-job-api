@@ -11,6 +11,7 @@ import {
   READ_JOB_USE_CASE_INTERFACE,
   type ReadJobUseCaseInterface,
 } from '@src/job/applications/contracts/read-job.use-case-interface';
+import { JobResponseMapper } from '@src/job/adapters/controllers/responses/job-response.mapper';
 
 @ApiTags('Job')
 @Controller('job')
@@ -18,6 +19,7 @@ export class ReadJobController {
   constructor(
     @Inject(READ_JOB_USE_CASE_INTERFACE)
     private readonly readJobUseCase: ReadJobUseCaseInterface,
+    private readonly jobResponseMapper: JobResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -34,6 +36,8 @@ export class ReadJobController {
   })
   @Get(':id')
   async getById(@Param('id') id: string): Promise<ReadJobResponseDto> {
-    return this.readJobUseCase.execute(id);
+    return this.jobResponseMapper.toResponse(
+      await this.readJobUseCase.execute(id),
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import { CompanyRoleEnum } from '@src/company/domain/enums/company-role.enum';
+import { CompanyStatusEnum } from '@src/company/domain/enums/company-status.enum';
 import {
   CompanyAddressDto as CompanyAddressResponseDto,
   CompanySocialDto as CompanySocialResponseDto,

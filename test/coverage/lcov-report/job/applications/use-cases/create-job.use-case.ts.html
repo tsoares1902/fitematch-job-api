@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>59/59</span>
+                <span class='fraction'>43/43</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.88% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/9</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>59/59</span>
+                <span class='fraction'>43/43</span>
             </div>
         
             
@@ -106,29 +106,7 @@
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -141,10 +119,9 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
@@ -170,48 +147,32 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
-import {
-  CREATE_JOB_REPOSITORY_INTERFACE,
-  type CreateJobRepositoryInterface,
-} from '@src/job/applications/contracts/create-job.repository-interface';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { type CreateJobRepositoryInterface } from '@src/job/applications/contracts/create-job.repository-interface';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
 import type { CreateJobUseCaseInterface } from '@src/job/applications/contracts/create-job.use-case-interface';
 import type { JobPayload } from '@src/job/applications/contracts/job-payload.interface';
-import type { Job } from '@src/job/applications/contracts/job.interface';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { JobOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 &nbsp;
-@Injectable()
 export class CreateJobUseCase implements CreateJobUseCaseInterface {
   constructor(
-    @Inject(CREATE_JOB_REPOSITORY_INTERFACE)
     private readonly createJobRepository: CreateJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
-    private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
   ) {}
 &nbsp;
-  async execute(data: JobPayload): Promise&lt;Job&gt; {
-    const job = await this.createJobRepository.create({
-      ...data,
-    });
+  async execute(data: JobPayload): Promise&lt;JobOutput&gt; {
+    const jobToCreate = JobEntity.create(data);
+    const job = await this.createJobRepository.create(
+      jobToCreate.toPrimitives(),
+    );
 &nbsp;
-    const company = await this.readCompanyRepository.findById(job.companyId);
+    const company = await this.companyReader.findById(job.companyId);
 &nbsp;
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 &nbsp;
     return {
@@ -225,16 +186,7 @@ export class CreateJobUseCase implements CreateJobUseCaseInterface {
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,
       status: job.status,
-      company: {
-        slug: company.slug,
-        name: company.name,
-        address: company.address,
-        social: company.social<span class="branch-0 cbranch-no" title="branch not covered" > ?? {},</span>
-        role: company.role,
-        logo: company.logo ?? '',
-        cover: company.cover ?? '',
-        status: company.status,
-      },
+      company,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     };
@@ -247,7 +199,7 @@ export class CreateJobUseCase implements CreateJobUseCaseInterface {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T06:44:33.188Z
+                at 2026-04-15T09:19:57.370Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

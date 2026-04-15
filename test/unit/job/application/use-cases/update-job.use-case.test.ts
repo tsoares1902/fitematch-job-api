@@ -1,22 +1,23 @@
-import { NotFoundException } from '@nestjs/common';
-import type { ReadCompanyRepositoryInterface } from '@src/company/applications/contracts/read-company.repository-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import type {
+  CompanyReaderPort,
+  JobCompanySnapshot,
+} from '@src/job/applications/contracts/company-reader.port';
 import type { UpdateJobPayload } from '@src/job/applications/contracts/job-payload.interface';
 import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 import type { UpdateJobRepositoryInterface } from '@src/job/applications/contracts/update-job.repository-interface';
 import { UpdateJobUseCase } from '@src/job/applications/use-cases/update-job.use-case';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('UpdateJobUseCase', () => {
   let useCase: UpdateJobUseCase;
   let repository: {
     update: jest.MockedFunction<UpdateJobRepositoryInterface['update']>;
   };
-  let companyRepository: {
-    findById: jest.MockedFunction<ReadCompanyRepositoryInterface['findById']>;
+  let companyReader: {
+    findById: jest.MockedFunction<CompanyReaderPort['findById']>;
+    list: jest.MockedFunction<CompanyReaderPort['list']>;
   };
 
   const jobId = 'job-id';
@@ -50,7 +51,7 @@ describe('UpdateJobUseCase', () => {
     updatedAt: new Date('2026-01-02T00:00:00.000Z'),
   };
 
-  const companyRecord: CompanyRecord = {
+  const companyRecord: JobCompanySnapshot = {
     id: companyId,
     slug: 'tecfit',
     name: 'Tecfit',
@@ -68,10 +69,10 @@ describe('UpdateJobUseCase', () => {
       linkedin: 'https://linkedin.com/company/tecfit',
       twitter: 'https://x.com/tecfit',
     },
-    role: CompanyRoleEnum.MAIN,
+    role: 'main',
     logo: '/images/logo.png',
     cover: '/images/cover.png',
-    status: CompanyStatusEnum.ACTIVE,
+    status: 'active',
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };
@@ -80,25 +81,27 @@ describe('UpdateJobUseCase', () => {
     repository = {
       update: jest.fn(),
     };
-    companyRepository = {
+    companyReader = {
       findById: jest.fn(),
+      list: jest.fn(),
     };
 
-    useCase = new UpdateJobUseCase(repository, companyRepository);
+    useCase = new UpdateJobUseCase(repository, companyReader);
   });
 
   describe('execute', () => {
     it('should update a job successfully', async () => {
       repository.update.mockResolvedValue(updatedJob);
-      companyRepository.findById.mockResolvedValue(companyRecord);
+      companyReader.findById.mockResolvedValue(companyRecord);
 
       const result = await useCase.execute(jobId, updateInput);
 
       expect(repository.update.mock.calls).toEqual([[jobId, updateInput]]);
-      expect(companyRepository.findById.mock.calls).toEqual([[companyId]]);
+      expect(companyReader.findById.mock.calls).toEqual([[companyId]]);
       expect(result).toEqual({
         ...updatedJob,
         company: {
+          id: companyRecord.id,
           slug: companyRecord.slug,
           name: companyRecord.name,
           address: companyRecord.address,
@@ -107,17 +110,19 @@ describe('UpdateJobUseCase', () => {
           logo: companyRecord.logo,
           cover: companyRecord.cover,
           status: companyRecord.status,
+          createdAt: companyRecord.createdAt,
+          updatedAt: companyRecord.updatedAt,
         },
       });
     });
 
     it('should normalize optional company fields', async () => {
       repository.update.mockResolvedValue(updatedJob);
-      companyRepository.findById.mockResolvedValue({
+      companyReader.findById.mockResolvedValue({
         ...companyRecord,
-        social: {} as CompanyRecord['social'],
-        logo: undefined,
-        cover: undefined,
+        social: {},
+        logo: '',
+        cover: '',
       });
 
       const result = await useCase.execute(jobId, updateInput);
@@ -127,24 +132,24 @@ describe('UpdateJobUseCase', () => {
       expect(result.company.cover).toBe('');
     });
 
-    it('should throw NotFoundException when the job does not exist', async () => {
+    it('should throw NotFoundApplicationError when the job does not exist', async () => {
       repository.update.mockResolvedValue(null);
+      const execution = useCase.execute(jobId, updateInput);
 
-      await expect(useCase.execute(jobId, updateInput)).rejects.toThrow(
-        new NotFoundException('Job not found!'),
-      );
+      await expect(execution).rejects.toThrow(NotFoundApplicationError);
+      await expect(execution).rejects.toThrow('Job not found!');
       expect(repository.update.mock.calls).toEqual([[jobId, updateInput]]);
-      expect(companyRepository.findById.mock.calls).toEqual([]);
+      expect(companyReader.findById.mock.calls).toEqual([]);
     });
 
-    it('should throw NotFoundException when the company does not exist', async () => {
+    it('should throw NotFoundApplicationError when the company does not exist', async () => {
       repository.update.mockResolvedValue(updatedJob);
-      companyRepository.findById.mockResolvedValue(null);
+      companyReader.findById.mockResolvedValue(null);
+      const execution = useCase.execute(jobId, updateInput);
 
-      await expect(useCase.execute(jobId, updateInput)).rejects.toThrow(
-        new NotFoundException('Company not found!'),
-      );
-      expect(companyRepository.findById.mock.calls).toEqual([[companyId]]);
+      await expect(execution).rejects.toThrow(NotFoundApplicationError);
+      await expect(execution).rejects.toThrow('Company not found!');
+      expect(companyReader.findById.mock.calls).toEqual([[companyId]]);
     });
 
     it('should propagate repository exceptions', async () => {

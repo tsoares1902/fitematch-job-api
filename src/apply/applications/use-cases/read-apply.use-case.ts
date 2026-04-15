@@ -1,15 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_APPLY_REPOSITORY_INTERFACE,
-  type ReadApplyRepositoryInterface,
-} from '@src/apply/applications/contracts/read-apply.repository-interface';
+import { type ReadApplyRepositoryInterface } from '@src/apply/applications/contracts/read-apply.repository-interface';
 import type { ReadApplyUseCaseInterface } from '@src/apply/applications/contracts/read-apply.use-case-interface';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class ReadApplyUseCase implements ReadApplyUseCaseInterface {
   constructor(
-    @Inject(READ_APPLY_REPOSITORY_INTERFACE)
     private readonly readApplyRepository: ReadApplyRepositoryInterface,
   ) {}
 
@@ -17,7 +12,7 @@ export class ReadApplyUseCase implements ReadApplyUseCaseInterface {
     const apply = await this.readApplyRepository.findById(id);
 
     if (!apply) {
-      throw new NotFoundException('Apply not found!');
+      throw new NotFoundApplicationError('Apply not found!');
     }
 
     return apply;

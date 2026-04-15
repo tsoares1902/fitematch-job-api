@@ -6,7 +6,10 @@ import { DeleteJobController } from '@src/job/adapters/controllers/delete-job.co
 import { ListJobController } from '@src/job/adapters/controllers/list-job.controller';
 import { ReadJobController } from '@src/job/adapters/controllers/read-job.controller';
 import { UpdateJobController } from '@src/job/adapters/controllers/update-job.controller';
-import { JobEntity, JobSchema } from '@src/job/domains/schemas/job.schema';
+import {
+  JobEntity,
+  JobSchema,
+} from '@src/job/infrastructure/persistence/mongoose/schemas/job.schema';
 import { jobProviders } from '@src/job/job.providers';
 
 @Module({

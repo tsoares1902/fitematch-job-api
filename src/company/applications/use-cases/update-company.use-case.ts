@@ -1,24 +1,25 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  UPDATE_COMPANY_REPOSITORY_INTERFACE,
-  type UpdateCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/update-company.repository-interface';
+import { type UpdateCompanyRepositoryInterface } from '@src/company/applications/contracts/update-company.repository-interface';
 import type { UpdateCompanyUseCaseInterface } from '@src/company/applications/contracts/update-company.use-case-interface';
-import type { Company } from '@src/company/applications/contracts/company.interface';
+import {
+  CompanyEntity,
+  type Company,
+} from '@src/company/domain/entities/company.entity';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class UpdateCompanyUseCase implements UpdateCompanyUseCaseInterface {
   constructor(
-    @Inject(UPDATE_COMPANY_REPOSITORY_INTERFACE)
     private readonly updateCompanyRepository: UpdateCompanyRepositoryInterface,
   ) {}
 
   async execute(id: string, data: Partial<Company>): Promise<CompanyRecord> {
-    const company = await this.updateCompanyRepository.update(id, data);
+    const company = await this.updateCompanyRepository.update(
+      id,
+      CompanyEntity.normalizeUpdate(data),
+    );
 
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 
     return company;

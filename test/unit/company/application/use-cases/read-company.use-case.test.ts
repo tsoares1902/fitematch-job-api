@@ -1,9 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
 import { ReadCompanyUseCase } from '@src/company/applications/use-cases/read-company.use-case';
 import type { ReadCompanyRepositoryInterface } from '@src/company/applications/contracts/read-company.repository-interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import { CompanyRoleEnum } from '@src/company/domain/enums/company-role.enum';
+import { CompanyStatusEnum } from '@src/company/domain/enums/company-status.enum';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('ReadCompanyUseCase', () => {
   let useCase: ReadCompanyUseCase;
@@ -54,10 +54,12 @@ describe('ReadCompanyUseCase', () => {
     expect(result).toEqual(companyRecord);
   });
 
-  it('should throw NotFoundException when the company does not exist', async () => {
+  it('should throw NotFoundApplicationError when the company does not exist', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(companyId)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(companyId)).rejects.toThrow(
+      NotFoundApplicationError,
+    );
     await expect(useCase.execute(companyId)).rejects.toThrow(
       'Company not found!',
     );

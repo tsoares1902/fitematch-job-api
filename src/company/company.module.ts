@@ -8,7 +8,7 @@ import { DeleteCompanyController } from '@src/company/adapters/controllers/delet
 import {
   CompanyEntity,
   CompanySchema,
-} from '@src/company/domains/schemas/company.schema';
+} from '@src/company/infrastructure/persistence/mongoose/schemas/company.schema';
 import { companyProviders } from '@src/company/company.providers';
 
 @Module({

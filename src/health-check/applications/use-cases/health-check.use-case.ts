@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import type { HealthCheckResponse } from '../contracts/health-check-response.interface';
+import type {
+  HealthCheckResponse,
+  HealthCheckUseCaseInterface,
+} from '../contracts/health-check-response.interface';
 
-@Injectable()
-export class HealthCheckUseCase {
+export class HealthCheckUseCase implements HealthCheckUseCaseInterface {
   execute(): HealthCheckResponse {
     return {
       healthy: true,

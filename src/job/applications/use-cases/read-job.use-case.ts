@@ -1,38 +1,30 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
-import {
-  READ_JOB_REPOSITORY_INTERFACE,
-  type ReadJobRepositoryInterface,
-} from '@src/job/applications/contracts/read-job.repository-interface';
+import { type ReadJobRepositoryInterface } from '@src/job/applications/contracts/read-job.repository-interface';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
 import type { ReadJobUseCaseInterface } from '@src/job/applications/contracts/read-job.use-case-interface';
-import type { ReadJobResponseDto } from '@src/job/adapters/dto/responses/read-job.response.dto';
-import MasksUtils from '@src/shared/applications/utils/masks.utils';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { JobOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class ReadJobUseCase implements ReadJobUseCaseInterface {
   constructor(
-    @Inject(READ_JOB_REPOSITORY_INTERFACE)
     private readonly readJobRepository: ReadJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
-    private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
   ) {}
 
-  async execute(id: string): Promise<ReadJobResponseDto> {
+  async execute(id: string): Promise<JobOutput> {
     const job = await this.readJobRepository.findById(id);
 
     if (!job) {
-      throw new NotFoundException('Job not found!');
+      throw new NotFoundApplicationError('Job not found!');
     }
 
-    const company = await this.readCompanyRepository.findById(job.companyId);
+    const company = await this.companyReader.findById(job.companyId);
 
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 
+    const jobEntity = JobEntity.fromRecord(job);
     return {
       id: job.id,
       companyId: job.companyId,
@@ -40,29 +32,11 @@ export class ReadJobUseCase implements ReadJobUseCaseInterface {
       title: job.title,
       slots: job.slots,
       cover: job.cover,
-      benefits: {
-        ...job.benefits,
-        salary:
-          job.benefits.salary === null || job.benefits.salary === undefined
-            ? null
-            : MasksUtils.applyBrazilianSalaryMask(String(job.benefits.salary)),
-      },
+      benefits: jobEntity.getBenefits(),
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,
       status: job.status,
-      company: {
-        id: company.id,
-        slug: company.slug,
-        name: company.name,
-        address: company.address,
-        social: company.social ?? {},
-        role: company.role,
-        logo: company.logo ?? '',
-        cover: company.cover ?? '',
-        status: company.status,
-        createdAt: company.createdAt,
-        updatedAt: company.updatedAt,
-      },
+      company,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     };

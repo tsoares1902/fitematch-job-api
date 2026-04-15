@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>61/61</span>
+                <span class='fraction'>47/47</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/11</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>61/61</span>
+                <span class='fraction'>47/47</span>
             </div>
         
             
@@ -110,27 +110,7 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -143,10 +123,11 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">5x</span>
@@ -174,50 +155,36 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
-import {
-  UPDATE_JOB_REPOSITORY,
-  type UpdateJobRepositoryInterface,
-} from '@src/job/applications/contracts/update-job.repository-interface';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { type UpdateJobRepositoryInterface } from '@src/job/applications/contracts/update-job.repository-interface';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
 import type { UpdateJobPayload } from '@src/job/applications/contracts/job-payload.interface';
 import type { UpdateJobUseCaseInterface } from '@src/job/applications/contracts/update-job.use-case-interface';
-import type { Job } from '@src/job/applications/contracts/job.interface';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { JobOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 &nbsp;
-@Injectable()
 export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
   constructor(
-    @Inject(UPDATE_JOB_REPOSITORY)
     private readonly updateJobRepository: UpdateJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
-    private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
   ) {}
 &nbsp;
-  async execute(id: string, data: UpdateJobPayload): Promise&lt;Job&gt; {
-    const job = await this.updateJobRepository.update(id, data);
+  async execute(id: string, data: UpdateJobPayload): Promise&lt;JobOutput&gt; {
+    const job = await this.updateJobRepository.update(
+      id,
+      JobEntity.normalizeUpdate(data),
+    );
 &nbsp;
     if (!job) {
-      throw new NotFoundException('Job not found!');
+      throw new NotFoundApplicationError('Job not found!');
     }
 &nbsp;
-    const company = await this.readCompanyRepository.findById(job.companyId);
+    const company = await this.companyReader.findById(job.companyId);
 &nbsp;
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 &nbsp;
     return {
@@ -231,16 +198,7 @@ export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,
       status: job.status,
-      company: {
-        slug: company.slug,
-        name: company.name,
-        address: company.address,
-        social: company.social<span class="branch-0 cbranch-no" title="branch not covered" > ?? {},</span>
-        role: company.role,
-        logo: company.logo ?? '',
-        cover: company.cover ?? '',
-        status: company.status,
-      },
+      company,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     };
@@ -253,7 +211,7 @@ export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T06:44:33.188Z
+                at 2026-04-15T09:19:57.370Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

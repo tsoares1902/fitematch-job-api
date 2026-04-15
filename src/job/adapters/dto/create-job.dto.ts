@@ -13,8 +13,8 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 import { CreateJobBenefitsDto } from './job-details.dto';
 
 export class CreateJobDto {

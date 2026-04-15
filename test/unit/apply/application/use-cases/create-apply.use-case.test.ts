@@ -1,8 +1,8 @@
 import { CreateApplyUseCase } from '@src/apply/applications/use-cases/create-apply.use-case';
 import type { CreateApplyRepositoryInterface } from '@src/apply/applications/contracts/create-apply.repository-interface';
-import type { Apply } from '@src/apply/applications/contracts/apply.interface';
+import type { Apply } from '@src/apply/domain/entities/apply.entity';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 
 describe('CreateApplyUseCase', () => {
   let useCase: CreateApplyUseCase;

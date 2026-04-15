@@ -8,7 +8,7 @@ import { UpdateApplyController } from '@src/apply/adapters/controllers/update-ap
 import {
   ApplyEntity,
   ApplySchema,
-} from '@src/apply/domains/schemas/apply.schema';
+} from '@src/apply/infrastructure/persistence/mongoose/schemas/apply.schema';
 import { applyProviders } from '@src/apply/apply.providers';
 
 @Module({

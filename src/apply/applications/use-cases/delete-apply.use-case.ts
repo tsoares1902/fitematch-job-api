@@ -1,14 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  DELETE_APPLY_REPOSITORY_INTERFACE,
-  type DeleteApplyRepositoryInterface,
-} from '@src/apply/applications/contracts/delete-apply.repository-interface';
+import { type DeleteApplyRepositoryInterface } from '@src/apply/applications/contracts/delete-apply.repository-interface';
 import type { DeleteApplyUseCaseInterface } from '@src/apply/applications/contracts/delete-apply.use-case-interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class DeleteApplyUseCase implements DeleteApplyUseCaseInterface {
   constructor(
-    @Inject(DELETE_APPLY_REPOSITORY_INTERFACE)
     private readonly deleteApplyRepository: DeleteApplyRepositoryInterface,
   ) {}
 
@@ -16,7 +11,7 @@ export class DeleteApplyUseCase implements DeleteApplyUseCaseInterface {
     const deleted = await this.deleteApplyRepository.delete(id);
 
     if (!deleted) {
-      throw new NotFoundException('Apply not found!');
+      throw new NotFoundApplicationError('Apply not found!');
     }
 
     return true;

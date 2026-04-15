@@ -1,15 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
+import { type ReadCompanyRepositoryInterface } from '@src/company/applications/contracts/read-company.repository-interface';
 import type { ReadCompanyUseCaseInterface } from '@src/company/applications/contracts/read-company.use-case-interface';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class ReadCompanyUseCase implements ReadCompanyUseCaseInterface {
   constructor(
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
     private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
   ) {}
 
@@ -17,7 +12,7 @@ export class ReadCompanyUseCase implements ReadCompanyUseCaseInterface {
     const company = await this.readCompanyRepository.findById(id);
 
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 
     return company;

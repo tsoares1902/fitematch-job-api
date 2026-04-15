@@ -1,10 +1,10 @@
-import { ConflictException } from '@nestjs/common';
 import { CreateCompanyUseCase } from '@src/company/applications/use-cases/create-company.use-case';
 import type { CreateCompanyRepositoryInterface } from '@src/company/applications/contracts/create-company.repository-interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
-import type { Company } from '@src/company/applications/contracts/company.interface';
+import { CompanyRoleEnum } from '@src/company/domain/enums/company-role.enum';
+import { CompanyStatusEnum } from '@src/company/domain/enums/company-status.enum';
+import type { Company } from '@src/company/domain/entities/company.entity';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { ConflictApplicationError } from '@src/shared/application/errors/conflict.application-error';
 
 describe('CreateCompanyUseCase', () => {
   let useCase: CreateCompanyUseCase;
@@ -59,7 +59,13 @@ describe('CreateCompanyUseCase', () => {
     const result = await useCase.execute(companyInput);
 
     expect(repository.create.mock.calls).toHaveLength(1);
-    expect(repository.create.mock.calls[0]).toEqual([companyInput]);
+    expect(repository.create.mock.calls[0]).toEqual([
+      {
+        ...companyInput,
+        role: CompanyRoleEnum.MAIN,
+        status: CompanyStatusEnum.ACTIVE,
+      },
+    ]);
     expect(result).toEqual(companyRecord);
   });
 
@@ -82,10 +88,16 @@ describe('CreateCompanyUseCase', () => {
   });
 
   it('should propagate repository exceptions', async () => {
-    const error = new ConflictException('slug already exists');
+    const error = new ConflictApplicationError('slug already exists');
     repository.create.mockRejectedValue(error);
 
     await expect(useCase.execute(companyInput)).rejects.toThrow(error);
-    expect(repository.create.mock.calls[0]).toEqual([companyInput]);
+    expect(repository.create.mock.calls[0]).toEqual([
+      {
+        ...companyInput,
+        role: CompanyRoleEnum.MAIN,
+        status: CompanyStatusEnum.ACTIVE,
+      },
+    ]);
   });
 });

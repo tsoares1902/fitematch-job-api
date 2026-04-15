@@ -7,11 +7,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ReadApplyResponseDto } from '@src/apply/adapters/dto/responses/read-apply.response.dto';
-import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
   READ_APPLY_USE_CASE_INTERFACE,
   type ReadApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/read-apply.use-case-interface';
+import { ApplyResponseMapper } from '@src/apply/adapters/controllers/responses/apply-response.mapper';
 
 @ApiTags('Apply')
 @Controller('apply')
@@ -19,6 +19,7 @@ export class ReadApplyController {
   constructor(
     @Inject(READ_APPLY_USE_CASE_INTERFACE)
     private readonly readApplyUseCase: ReadApplyUseCaseInterface,
+    private readonly applyResponseMapper: ApplyResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -34,7 +35,9 @@ export class ReadApplyController {
     description: 'Apply not found!',
   })
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<ApplyRecord> {
-    return this.readApplyUseCase.execute(id);
+  async getById(@Param('id') id: string): Promise<ReadApplyResponseDto> {
+    return this.applyResponseMapper.toResponse(
+      await this.readApplyUseCase.execute(id),
+    );
   }
 }

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApplicationExceptionFilter } from '@src/shared/presentation/http/filters/application-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -27,6 +28,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new ApplicationExceptionFilter());
   const configService = app.get<ConfigService>(ConfigService);
   const port = configService.get<number>('api.port', 3000);
   await app.listen(port ?? 3000);

@@ -8,12 +8,11 @@ import {
 } from '@nestjs/swagger';
 import { CreateApplyDto } from '@src/apply/adapters/dto/create-apply.dto';
 import { CreateApplyResponseDto } from '@src/apply/adapters/dto/responses/create-apply.response.dto';
-import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
   CREATE_APPLY_USE_CASE_INTERFACE,
   type CreateApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/create-apply.use-case-interface';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyResponseMapper } from '@src/apply/adapters/controllers/responses/apply-response.mapper';
 
 @ApiTags('Apply')
 @Controller('apply')
@@ -21,6 +20,7 @@ export class CreateApplyController {
   constructor(
     @Inject(CREATE_APPLY_USE_CASE_INTERFACE)
     private readonly createApplyUseCase: CreateApplyUseCaseInterface,
+    private readonly applyResponseMapper: ApplyResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -36,10 +36,9 @@ export class CreateApplyController {
     description: 'Validation error in the submitted data.',
   })
   @Post()
-  async create(@Body() data: CreateApplyDto): Promise<ApplyRecord> {
-    return this.createApplyUseCase.execute({
-      ...data,
-      status: data.status ?? ApplyStatusEnum.ACTIVE,
-    });
+  async create(@Body() data: CreateApplyDto): Promise<CreateApplyResponseDto> {
+    return this.applyResponseMapper.toResponse(
+      await this.createApplyUseCase.execute(data),
+    );
   }
 }

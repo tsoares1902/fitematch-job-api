@@ -1,6 +1,6 @@
-import type { JobBenefits } from './job.interface';
-import type { JobRoleEnum } from './job-role.enum';
-import type { JobStatusEnum } from './job-status.enum';
+import type { JobBenefits } from '@src/job/domain/entities/job.entity';
+import type { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import type { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 
 export interface JobPayload {
   companyId: string;

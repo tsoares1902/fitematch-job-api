@@ -1,24 +1,22 @@
-import { NotFoundException } from '@nestjs/common';
-import type { ReadCompanyRepositoryInterface } from '@src/company/applications/contracts/read-company.repository-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import type {
+  CompanyReaderPort,
+  JobCompanySnapshot,
+} from '@src/job/applications/contracts/company-reader.port';
 import type { ReadJobRepositoryInterface } from '@src/job/applications/contracts/read-job.repository-interface';
 import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 import { ReadJobUseCase } from '@src/job/applications/use-cases/read-job.use-case';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('ReadJobUseCase', () => {
   let useCase: ReadJobUseCase;
   let repository: ReadJobRepositoryInterface;
-  let companyRepository: ReadCompanyRepositoryInterface;
+  let companyReader: CompanyReaderPort;
   let findJobByIdSpy: jest.SpiedFunction<
     ReadJobRepositoryInterface['findById']
   >;
-  let findCompanyByIdSpy: jest.SpiedFunction<
-    ReadCompanyRepositoryInterface['findById']
-  >;
+  let findCompanyByIdSpy: jest.SpiedFunction<CompanyReaderPort['findById']>;
 
   const jobId = 'job-id';
   const companyId = 'company-id';
@@ -45,7 +43,7 @@ describe('ReadJobUseCase', () => {
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };
 
-  const companyRecord: CompanyRecord = {
+  const companyRecord: JobCompanySnapshot = {
     id: companyId,
     slug: 'tecfit',
     name: 'Tecfit',
@@ -63,10 +61,10 @@ describe('ReadJobUseCase', () => {
       linkedin: 'https://linkedin.com/company/tecfit',
       twitter: 'https://x.com/tecfit',
     },
-    role: CompanyRoleEnum.MAIN,
+    role: 'main',
     logo: '/images/logo.png',
     cover: '/images/cover.png',
-    status: CompanyStatusEnum.ACTIVE,
+    status: 'active',
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   };
@@ -75,17 +73,18 @@ describe('ReadJobUseCase', () => {
     repository = {
       findById: () => Promise.resolve(null),
     };
-    companyRepository = {
+    companyReader = {
       findById: () => Promise.resolve(null),
+      list: () => Promise.resolve([]),
     };
     findJobByIdSpy = jest.spyOn(repository, 'findById');
-    findCompanyByIdSpy = jest.spyOn(companyRepository, 'findById');
+    findCompanyByIdSpy = jest.spyOn(companyReader, 'findById');
 
-    useCase = new ReadJobUseCase(repository, companyRepository);
+    useCase = new ReadJobUseCase(repository, companyReader);
   });
 
   describe('execute', () => {
-    it('should return a job with company details and formatted salary', async () => {
+    it('should return a job with company details', async () => {
       findJobByIdSpy.mockResolvedValue(jobRecord);
       findCompanyByIdSpy.mockResolvedValue(companyRecord);
 
@@ -97,7 +96,7 @@ describe('ReadJobUseCase', () => {
         ...jobRecord,
         benefits: {
           ...jobRecord.benefits,
-          salary: 'R$\u00A02.500,00',
+          salary: 2500,
         },
         company: {
           id: companyRecord.id,
@@ -127,9 +126,9 @@ describe('ReadJobUseCase', () => {
       });
       findCompanyByIdSpy.mockResolvedValue({
         ...companyRecord,
-        social: {} as CompanyRecord['social'],
-        logo: undefined,
-        cover: undefined,
+        social: {},
+        logo: '',
+        cover: '',
       });
 
       const result = await useCase.execute(jobId);
@@ -140,23 +139,23 @@ describe('ReadJobUseCase', () => {
       expect(result.company.cover).toBe('');
     });
 
-    it('should throw NotFoundException when the job does not exist', async () => {
+    it('should throw NotFoundApplicationError when the job does not exist', async () => {
       findJobByIdSpy.mockResolvedValue(null);
+      const execution = useCase.execute(jobId);
 
-      await expect(useCase.execute(jobId)).rejects.toThrow(
-        new NotFoundException('Job not found!'),
-      );
+      await expect(execution).rejects.toThrow(NotFoundApplicationError);
+      await expect(execution).rejects.toThrow('Job not found!');
       expect(findJobByIdSpy.mock.calls).toEqual([[jobId]]);
       expect(findCompanyByIdSpy.mock.calls).toEqual([]);
     });
 
-    it('should throw NotFoundException when the company does not exist', async () => {
+    it('should throw NotFoundApplicationError when the company does not exist', async () => {
       findJobByIdSpy.mockResolvedValue(jobRecord);
       findCompanyByIdSpy.mockResolvedValue(null);
+      const execution = useCase.execute(jobId);
 
-      await expect(useCase.execute(jobId)).rejects.toThrow(
-        new NotFoundException('Company not found!'),
-      );
+      await expect(execution).rejects.toThrow(NotFoundApplicationError);
+      await expect(execution).rejects.toThrow('Company not found!');
       expect(findJobByIdSpy.mock.calls).toEqual([[jobId]]);
       expect(findCompanyByIdSpy.mock.calls).toEqual([[companyId]]);
     });

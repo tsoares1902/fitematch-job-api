@@ -1,36 +1,31 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
-import {
-  UPDATE_JOB_REPOSITORY,
-  type UpdateJobRepositoryInterface,
-} from '@src/job/applications/contracts/update-job.repository-interface';
+import { type UpdateJobRepositoryInterface } from '@src/job/applications/contracts/update-job.repository-interface';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
 import type { UpdateJobPayload } from '@src/job/applications/contracts/job-payload.interface';
 import type { UpdateJobUseCaseInterface } from '@src/job/applications/contracts/update-job.use-case-interface';
-import type { Job } from '@src/job/applications/contracts/job.interface';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { JobOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
   constructor(
-    @Inject(UPDATE_JOB_REPOSITORY)
     private readonly updateJobRepository: UpdateJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
-    private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
   ) {}
 
-  async execute(id: string, data: UpdateJobPayload): Promise<Job> {
-    const job = await this.updateJobRepository.update(id, data);
+  async execute(id: string, data: UpdateJobPayload): Promise<JobOutput> {
+    const job = await this.updateJobRepository.update(
+      id,
+      JobEntity.normalizeUpdate(data),
+    );
 
     if (!job) {
-      throw new NotFoundException('Job not found!');
+      throw new NotFoundApplicationError('Job not found!');
     }
 
-    const company = await this.readCompanyRepository.findById(job.companyId);
+    const company = await this.companyReader.findById(job.companyId);
 
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 
     return {
@@ -44,16 +39,7 @@ export class UpdateJobUseCase implements UpdateJobUseCaseInterface {
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,
       status: job.status,
-      company: {
-        slug: company.slug,
-        name: company.name,
-        address: company.address,
-        social: company.social ?? {},
-        role: company.role,
-        logo: company.logo ?? '',
-        cover: company.cover ?? '',
-        status: company.status,
-      },
+      company,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     };

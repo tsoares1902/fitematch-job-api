@@ -1,4 +1,4 @@
-import type { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import type { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 
 export interface ApplyRecord {
   id: string;

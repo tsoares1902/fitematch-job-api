@@ -1,34 +1,27 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  READ_COMPANY_REPOSITORY_INTERFACE,
-  type ReadCompanyRepositoryInterface,
-} from '@src/company/applications/contracts/read-company.repository-interface';
-import {
-  CREATE_JOB_REPOSITORY_INTERFACE,
-  type CreateJobRepositoryInterface,
-} from '@src/job/applications/contracts/create-job.repository-interface';
+import { type CreateJobRepositoryInterface } from '@src/job/applications/contracts/create-job.repository-interface';
+import type { CompanyReaderPort } from '@src/job/applications/contracts/company-reader.port';
 import type { CreateJobUseCaseInterface } from '@src/job/applications/contracts/create-job.use-case-interface';
 import type { JobPayload } from '@src/job/applications/contracts/job-payload.interface';
-import type { Job } from '@src/job/applications/contracts/job.interface';
+import { JobEntity } from '@src/job/domain/entities/job.entity';
+import type { JobOutput } from '@src/job/applications/contracts/job-output.interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
-@Injectable()
 export class CreateJobUseCase implements CreateJobUseCaseInterface {
   constructor(
-    @Inject(CREATE_JOB_REPOSITORY_INTERFACE)
     private readonly createJobRepository: CreateJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
-    private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
+    private readonly companyReader: CompanyReaderPort,
   ) {}
 
-  async execute(data: JobPayload): Promise<Job> {
-    const job = await this.createJobRepository.create({
-      ...data,
-    });
+  async execute(data: JobPayload): Promise<JobOutput> {
+    const jobToCreate = JobEntity.create(data);
+    const job = await this.createJobRepository.create(
+      jobToCreate.toPrimitives(),
+    );
 
-    const company = await this.readCompanyRepository.findById(job.companyId);
+    const company = await this.companyReader.findById(job.companyId);
 
     if (!company) {
-      throw new NotFoundException('Company not found!');
+      throw new NotFoundApplicationError('Company not found!');
     }
 
     return {
@@ -42,16 +35,7 @@ export class CreateJobUseCase implements CreateJobUseCaseInterface {
       isPaidAdvertising: job.isPaidAdvertising,
       role: job.role,
       status: job.status,
-      company: {
-        slug: company.slug,
-        name: company.name,
-        address: company.address,
-        social: company.social ?? {},
-        role: company.role,
-        logo: company.logo ?? '',
-        cover: company.cover ?? '',
-        status: company.status,
-      },
+      company,
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     };

@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { ApiConfig } from '@src/shared/applications/contracts/api.config';
+import { ApiConfig } from '@src/config/api-config.interface';
 
 const { APPLICATION_PORT } = process.env;
 const parsedPort = Number.parseInt(APPLICATION_PORT ?? '', 10);

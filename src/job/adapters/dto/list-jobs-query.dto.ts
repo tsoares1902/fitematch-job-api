@@ -14,8 +14,8 @@ import {
   type ListJobsSortField,
   type ListJobsSortOrder,
 } from '@src/job/applications/contracts/list-job-query.interface';
-import { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 
 enum ListJobsSortFieldEnum {
   IS_PAID_ADVERTISING = 'isPaidAdvertising',

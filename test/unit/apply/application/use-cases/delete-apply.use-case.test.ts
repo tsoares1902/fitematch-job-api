@@ -1,6 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
 import type { DeleteApplyRepositoryInterface } from '@src/apply/applications/contracts/delete-apply.repository-interface';
 import { DeleteApplyUseCase } from '@src/apply/applications/use-cases/delete-apply.use-case';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('DeleteApplyUseCase', () => {
   let useCase: DeleteApplyUseCase;
@@ -26,10 +26,12 @@ describe('DeleteApplyUseCase', () => {
     expect(result).toBe(true);
   });
 
-  it('should throw NotFoundException when the apply does not exist', async () => {
+  it('should throw NotFoundApplicationError when the apply does not exist', async () => {
     repository.delete.mockResolvedValue(false);
 
-    await expect(useCase.execute(applyId)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(applyId)).rejects.toThrow(
+      NotFoundApplicationError,
+    );
     await expect(useCase.execute(applyId)).rejects.toThrow('Apply not found!');
     expect(repository.delete.mock.calls[0]).toEqual([applyId]);
   });

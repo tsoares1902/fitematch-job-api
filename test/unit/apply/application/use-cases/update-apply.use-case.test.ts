@@ -1,9 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
-import type { Apply } from '@src/apply/applications/contracts/apply.interface';
+import type { Apply } from '@src/apply/domain/entities/apply.entity';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 import type { UpdateApplyRepositoryInterface } from '@src/apply/applications/contracts/update-apply.repository-interface';
 import { UpdateApplyUseCase } from '@src/apply/applications/use-cases/update-apply.use-case';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('UpdateApplyUseCase', () => {
   let useCase: UpdateApplyUseCase;
@@ -42,11 +42,11 @@ describe('UpdateApplyUseCase', () => {
     expect(result).toEqual(updatedApply);
   });
 
-  it('should throw NotFoundException when the apply does not exist', async () => {
+  it('should throw NotFoundApplicationError when the apply does not exist', async () => {
     repository.update.mockResolvedValue(null);
 
     await expect(useCase.execute(applyId, updateInput)).rejects.toThrow(
-      NotFoundException,
+      NotFoundApplicationError,
     );
     await expect(useCase.execute(applyId, updateInput)).rejects.toThrow(
       'Apply not found!',

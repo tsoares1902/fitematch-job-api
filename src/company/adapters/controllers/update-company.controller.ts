@@ -14,7 +14,7 @@ import {
   UPDATE_COMPANY_USE_CASE_INTERFACE,
   type UpdateCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/update-company.use-case-interface';
-import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
+import { CompanyResponseMapper } from '@src/company/adapters/controllers/responses/company-response.mapper';
 
 @ApiTags('Company')
 @Controller('company')
@@ -22,6 +22,7 @@ export class UpdateCompanyController {
   constructor(
     @Inject(UPDATE_COMPANY_USE_CASE_INTERFACE)
     private readonly updateCompanyUseCase: UpdateCompanyUseCaseInterface,
+    private readonly companyResponseMapper: CompanyResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -44,7 +45,9 @@ export class UpdateCompanyController {
   async update(
     @Param('id') id: string,
     @Body() data: UpdateCompanyDto,
-  ): Promise<CompanyRecord> {
-    return this.updateCompanyUseCase.execute(id, data);
+  ): Promise<UpdateCompanyResponseDto> {
+    return this.companyResponseMapper.toResponse(
+      await this.updateCompanyUseCase.execute(id, data),
+    );
   }
 }

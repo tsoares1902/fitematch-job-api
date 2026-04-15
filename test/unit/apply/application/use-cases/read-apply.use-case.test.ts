@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
 import type { ReadApplyRepositoryInterface } from '@src/apply/applications/contracts/read-apply.repository-interface';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 import { ReadApplyUseCase } from '@src/apply/applications/use-cases/read-apply.use-case';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('ReadApplyUseCase', () => {
   let useCase: ReadApplyUseCase;
@@ -37,10 +37,12 @@ describe('ReadApplyUseCase', () => {
     expect(result).toEqual(applyRecord);
   });
 
-  it('should throw NotFoundException when the apply does not exist', async () => {
+  it('should throw NotFoundApplicationError when the apply does not exist', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(applyId)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(applyId)).rejects.toThrow(
+      NotFoundApplicationError,
+    );
     await expect(useCase.execute(applyId)).rejects.toThrow('Apply not found!');
     expect(repository.findById.mock.calls[0]).toEqual([applyId]);
   });

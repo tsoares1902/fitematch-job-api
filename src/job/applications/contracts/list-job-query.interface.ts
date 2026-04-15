@@ -1,5 +1,5 @@
-import type { JobRoleEnum } from '@src/job/applications/contracts/job-role.enum';
-import type { JobStatusEnum } from '@src/job/applications/contracts/job-status.enum';
+import type { JobRoleEnum } from '@src/job/domain/enums/job-role.enum';
+import type { JobStatusEnum } from '@src/job/domain/enums/job-status.enum';
 
 export type ListJobsSortField =
   | 'isPaidAdvertising'

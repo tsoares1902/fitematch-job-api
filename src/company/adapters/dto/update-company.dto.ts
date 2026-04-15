@@ -8,8 +8,8 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { CompanyRoleEnum } from '@src/company/applications/contracts/company-role.enum';
-import { CompanyStatusEnum } from '@src/company/applications/contracts/company-status.enum';
+import { CompanyRoleEnum } from '@src/company/domain/enums/company-role.enum';
+import { CompanyStatusEnum } from '@src/company/domain/enums/company-status.enum';
 import { Type } from 'class-transformer';
 import {
   UpdateCompanyAddressDto,

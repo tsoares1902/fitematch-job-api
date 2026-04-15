@@ -1,4 +1,4 @@
-import type { Apply } from '@src/apply/applications/contracts/apply.interface';
+import type { Apply } from '@src/apply/domain/entities/apply.entity';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
 export const UPDATE_APPLY_USE_CASE_INTERFACE =

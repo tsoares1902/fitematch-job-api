@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
+import { ApplyStatusEnum } from '@src/apply/domain/enums/apply-status.enum';
 
 export class ListApplyResponseDto {
   @ApiProperty()

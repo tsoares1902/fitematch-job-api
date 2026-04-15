@@ -9,11 +9,11 @@ import {
 } from '@nestjs/swagger';
 import { CreateJobDto } from '@src/job/adapters/dto/create-job.dto';
 import { CreateJobResponseDto } from '@src/job/adapters/dto/responses/create-job.response.dto';
-import type { Job } from '@src/job/applications/contracts/job.interface';
 import {
   CREATE_JOB_USE_CASE_INTERFACE,
   type CreateJobUseCaseInterface,
 } from '@src/job/applications/contracts/create-job.use-case-interface';
+import { JobResponseMapper } from '@src/job/adapters/controllers/responses/job-response.mapper';
 
 @ApiTags('Job')
 @Controller('job')
@@ -21,6 +21,7 @@ export class CreateJobController {
   constructor(
     @Inject(CREATE_JOB_USE_CASE_INTERFACE)
     private readonly createJobUseCase: CreateJobUseCaseInterface,
+    private readonly jobResponseMapper: JobResponseMapper,
   ) {}
 
   @ApiOperation({
@@ -39,7 +40,9 @@ export class CreateJobController {
     description: 'Job slug already exists.',
   })
   @Post()
-  async create(@Body() data: CreateJobDto): Promise<Job> {
-    return this.createJobUseCase.execute(data);
+  async create(@Body() data: CreateJobDto): Promise<CreateJobResponseDto> {
+    return this.jobResponseMapper.toResponse(
+      await this.createJobUseCase.execute(data),
+    );
   }
 }

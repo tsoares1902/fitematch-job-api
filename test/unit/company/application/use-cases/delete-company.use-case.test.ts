@@ -1,6 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
 import { DeleteCompanyUseCase } from '@src/company/applications/use-cases/delete-company.use-case';
 import type { DeleteCompanyRepositoryInterface } from '@src/company/applications/contracts/delete-company.repository-interface';
+import { NotFoundApplicationError } from '@src/shared/application/errors/not-found.application-error';
 
 describe('DeleteCompanyUseCase', () => {
   let useCase: DeleteCompanyUseCase;
@@ -26,10 +26,12 @@ describe('DeleteCompanyUseCase', () => {
     expect(result).toBe(true);
   });
 
-  it('should throw NotFoundException when the company does not exist', async () => {
+  it('should throw NotFoundApplicationError when the company does not exist', async () => {
     repository.delete.mockResolvedValue(false);
 
-    await expect(useCase.execute(companyId)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(companyId)).rejects.toThrow(
+      NotFoundApplicationError,
+    );
     await expect(useCase.execute(companyId)).rejects.toThrow(
       'Company not found!',
     );
