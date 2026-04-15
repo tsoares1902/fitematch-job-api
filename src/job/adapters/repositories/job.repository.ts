@@ -45,7 +45,9 @@ export class JobRepository
     }
   }
 
-  async list(filters: ListJobsQueryInterface): Promise<ListJobRepositoryResult> {
+  async list(
+    filters: ListJobsQueryInterface,
+  ): Promise<ListJobRepositoryResult> {
     const page = Number(filters.page ?? 1);
     const limit = Number(filters.limit ?? 10);
     const currentPage = page > 0 ? page : 1;
@@ -92,10 +94,7 @@ export class JobRepository
     return job ? this.toRecord(job) : null;
   }
 
-  async update(
-    id: string,
-    data: UpdateJobPayload,
-  ): Promise<JobRecord | null> {
+  async update(id: string, data: UpdateJobPayload): Promise<JobRecord | null> {
     try {
       const job = await this.jobModel
         .findByIdAndUpdate(id, data, { new: true, runValidators: true })

@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Transform, type TransformFnParams, Type } from 'class-transformer';
 import {
   IsInt,
   IsEnum,
@@ -57,9 +57,19 @@ export class ListJobsQueryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(({ value }) =>
-    value === 'true' ? true : value === 'false' ? false : value,
-  )
+  @Transform(({ value }: TransformFnParams): unknown => {
+    const rawValue: unknown = value;
+
+    if (value === 'true') {
+      return true;
+    }
+
+    if (value === 'false') {
+      return false;
+    }
+
+    return rawValue;
+  })
   @IsBoolean()
   isPaidAdvertising?: boolean;
 

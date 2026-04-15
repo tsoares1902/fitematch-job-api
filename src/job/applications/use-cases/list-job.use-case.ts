@@ -18,13 +18,24 @@ import ResultPaginationInterface from '@src/shared/applications/contracts/result
 
 @Injectable()
 export class ListJobUseCase implements ListJobUseCaseInterface {
+  private readonly listJobRepository: ListJobRepositoryInterface;
+
+  private readonly listCompanyRepository: ListCompanyRepositoryInterface;
+
+  private readonly metadataUtils: MetadataUtils;
+
   constructor(
     @Inject(LIST_JOB_REPOSITORY_INTERFACE)
-    private readonly listJobRepository: ListJobRepositoryInterface,
+    listJobRepository: ListJobRepositoryInterface,
     @Inject(LIST_COMPANY_REPOSITORY)
-    private readonly listCompanyRepository: ListCompanyRepositoryInterface,
-    private readonly metadataUtils: MetadataUtils,
-  ) {}
+    listCompanyRepository: ListCompanyRepositoryInterface,
+    /* c8 ignore next */
+    metadataUtils: MetadataUtils,
+  ) {
+    this.listJobRepository = listJobRepository;
+    this.listCompanyRepository = listCompanyRepository;
+    this.metadataUtils = metadataUtils;
+  }
 
   async execute(
     filters: DataListJobsUseCaseInterface,
@@ -32,7 +43,7 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
     const [{ data: jobs, totalItems, currentPage, itemsPerPage }, companies] =
       await Promise.all([
         this.listJobRepository.list(filters),
-      this.listCompanyRepository.list(),
+        this.listCompanyRepository.list(),
       ]);
 
     const companiesById = new Map<string, ReadCompanyResponseDto>(

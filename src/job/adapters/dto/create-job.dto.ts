@@ -42,7 +42,11 @@ export class CreateJobDto {
   @Min(1)
   slots!: number;
 
-  @ApiProperty({ example: '/images/job-cover.png', minLength: 1, maxLength: 255 })
+  @ApiProperty({
+    example: '/images/job-cover.png',
+    minLength: 1,
+    maxLength: 255,
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
