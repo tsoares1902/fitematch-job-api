@@ -1,7 +1,8 @@
-import type { Company } from './company.interface';
-import type { CompanyRecord } from './company-record.interface';
+import type { Company } from '@src/company/applications/contracts/company.interface';
+import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
 
-export const CREATE_COMPANY_REPOSITORY = 'CREATE_COMPANY_REPOSITORY';
+export const CREATE_COMPANY_REPOSITORY_INTERFACE =
+  'CREATE_COMPANY_REPOSITORY_INTERFACE';
 
 export interface CreateCompanyRepositoryInterface {
   create(data: Company): Promise<CompanyRecord>;

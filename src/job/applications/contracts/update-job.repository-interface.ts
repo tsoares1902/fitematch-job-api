@@ -1,5 +1,5 @@
 import type { UpdateJobPayload } from './job-payload.interface';
-import type { JobRecord } from './job-record.interface';
+import type { JobRecord } from '@src/job/applications/contracts/job-record.interface';
 
 export const UPDATE_JOB_REPOSITORY = 'UPDATE_JOB_REPOSITORY';
 

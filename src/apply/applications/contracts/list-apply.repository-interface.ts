@@ -1,6 +1,7 @@
-import type { ApplyRecord } from './apply-record.interface';
+import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
-export const LIST_APPLY_REPOSITORY = 'LIST_APPLY_REPOSITORY';
+export const LIST_APPLY_REPOSITORY_INTERFACE =
+  'LIST_APPLY_REPOSITORY_INTERFACE';
 
 export interface ListApplyRepositoryInterface {
   list(): Promise<ApplyRecord[]>;

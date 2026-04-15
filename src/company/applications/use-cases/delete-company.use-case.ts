@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  DELETE_COMPANY_REPOSITORY,
+  DELETE_COMPANY_REPOSITORY_INTERFACE,
   type DeleteCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/delete-company.repository-interface';
 import type { DeleteCompanyUseCaseInterface } from '@src/company/applications/contracts/delete-company.use-case-interface';
@@ -8,7 +8,7 @@ import type { DeleteCompanyUseCaseInterface } from '@src/company/applications/co
 @Injectable()
 export class DeleteCompanyUseCase implements DeleteCompanyUseCaseInterface {
   constructor(
-    @Inject(DELETE_COMPANY_REPOSITORY)
+    @Inject(DELETE_COMPANY_REPOSITORY_INTERFACE)
     private readonly deleteCompanyRepository: DeleteCompanyRepositoryInterface,
   ) {}
 

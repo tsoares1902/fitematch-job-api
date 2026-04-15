@@ -1,7 +1,8 @@
-import type { Apply } from './apply.interface';
-import type { ApplyRecord } from './apply-record.interface';
+import type { Apply } from '@src/apply/applications/contracts/apply.interface';
+import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
-export const UPDATE_APPLY_REPOSITORY = 'UPDATE_APPLY_REPOSITORY';
+export const UPDATE_APPLY_REPOSITORY_INTERFACE =
+  'UPDATE_APPLY_REPOSITORY_INTERFACE';
 
 export interface UpdateApplyRepositoryInterface {
   update(id: string, data: Partial<Apply>): Promise<ApplyRecord | null>;

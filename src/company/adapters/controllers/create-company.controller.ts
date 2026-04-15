@@ -10,7 +10,7 @@ import {
 import { CreateCompanyDto } from '@src/company/adapters/dto/create-company.dto';
 import { CreateCompanyResponseDto } from '@src/company/adapters/dto/responses/create-company.response.dto';
 import {
-  CREATE_COMPANY_USE_CASE,
+  CREATE_COMPANY_USE_CASE_INTERFACE,
   type CreateCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/create-company.use-case-interface';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
@@ -19,7 +19,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Controller('company')
 export class CreateCompanyController {
   constructor(
-    @Inject(CREATE_COMPANY_USE_CASE)
+    @Inject(CREATE_COMPANY_USE_CASE_INTERFACE)
     private readonly createCompanyUseCase: CreateCompanyUseCaseInterface,
   ) {}
 

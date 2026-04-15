@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListApplyResponseDto } from '@src/apply/adapters/dto/responses/list-apply.response.dto';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
-  LIST_APPLY_USE_CASE,
+  LIST_APPLY_USE_CASE_INTERFACE,
   type ListApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/list-apply.use-case-interface';
 
@@ -11,7 +11,7 @@ import {
 @Controller('apply')
 export class ListApplyController {
   constructor(
-    @Inject(LIST_APPLY_USE_CASE)
+    @Inject(LIST_APPLY_USE_CASE_INTERFACE)
     private readonly listApplyUseCase: ListApplyUseCaseInterface,
   ) {}
 

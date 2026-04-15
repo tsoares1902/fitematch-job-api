@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  LIST_COMPANY_REPOSITORY,
+  LIST_COMPANY_REPOSITORY_INTERFACE,
   type ListCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/list-company.repository-interface';
 import type { ListCompanyUseCaseInterface } from '@src/company/applications/contracts/list-company.use-case-interface';
@@ -9,7 +9,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Injectable()
 export class ListCompanyUseCase implements ListCompanyUseCaseInterface {
   constructor(
-    @Inject(LIST_COMPANY_REPOSITORY)
+    @Inject(LIST_COMPANY_REPOSITORY_INTERFACE)
     private readonly listCompanyRepository: ListCompanyRepositoryInterface,
   ) {}
 

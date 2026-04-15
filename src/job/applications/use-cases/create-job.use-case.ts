@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  READ_COMPANY_REPOSITORY,
+  READ_COMPANY_REPOSITORY_INTERFACE,
   type ReadCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/read-company.repository-interface';
 import {
-  CREATE_JOB_REPOSITORY,
+  CREATE_JOB_REPOSITORY_INTERFACE,
   type CreateJobRepositoryInterface,
 } from '@src/job/applications/contracts/create-job.repository-interface';
 import type { CreateJobUseCaseInterface } from '@src/job/applications/contracts/create-job.use-case-interface';
@@ -14,9 +14,9 @@ import type { Job } from '@src/job/applications/contracts/job.interface';
 @Injectable()
 export class CreateJobUseCase implements CreateJobUseCaseInterface {
   constructor(
-    @Inject(CREATE_JOB_REPOSITORY)
+    @Inject(CREATE_JOB_REPOSITORY_INTERFACE)
     private readonly createJobRepository: CreateJobRepositoryInterface,
-    @Inject(READ_COMPANY_REPOSITORY)
+    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
     private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
   ) {}
 

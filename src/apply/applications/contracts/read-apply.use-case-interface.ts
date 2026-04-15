@@ -1,6 +1,6 @@
-import type { ApplyRecord } from './apply-record.interface';
+import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
-export const READ_APPLY_USE_CASE = 'READ_APPLY_USE_CASE';
+export const READ_APPLY_USE_CASE_INTERFACE = 'READ_APPLY_USE_CASE_INTERFACE';
 
 export interface ReadApplyUseCaseInterface {
   execute(id: string): Promise<ApplyRecord>;

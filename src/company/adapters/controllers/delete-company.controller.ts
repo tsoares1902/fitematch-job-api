@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
-  DELETE_COMPANY_USE_CASE,
+  DELETE_COMPANY_USE_CASE_INTERFACE,
   type DeleteCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/delete-company.use-case-interface';
 
@@ -15,7 +15,7 @@ import {
 @Controller('company')
 export class DeleteCompanyController {
   constructor(
-    @Inject(DELETE_COMPANY_USE_CASE)
+    @Inject(DELETE_COMPANY_USE_CASE_INTERFACE)
     private readonly deleteCompanyUseCase: DeleteCompanyUseCaseInterface,
   ) {}
 

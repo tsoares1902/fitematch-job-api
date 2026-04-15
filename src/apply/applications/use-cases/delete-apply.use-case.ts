@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  DELETE_APPLY_REPOSITORY,
+  DELETE_APPLY_REPOSITORY_INTERFACE,
   type DeleteApplyRepositoryInterface,
 } from '@src/apply/applications/contracts/delete-apply.repository-interface';
 import type { DeleteApplyUseCaseInterface } from '@src/apply/applications/contracts/delete-apply.use-case-interface';
@@ -8,7 +8,7 @@ import type { DeleteApplyUseCaseInterface } from '@src/apply/applications/contra
 @Injectable()
 export class DeleteApplyUseCase implements DeleteApplyUseCaseInterface {
   constructor(
-    @Inject(DELETE_APPLY_REPOSITORY)
+    @Inject(DELETE_APPLY_REPOSITORY_INTERFACE)
     private readonly deleteApplyRepository: DeleteApplyRepositoryInterface,
   ) {}
 

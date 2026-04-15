@@ -1,6 +1,7 @@
-import type { CompanyRecord } from './company-record.interface';
+import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
 
-export const READ_COMPANY_REPOSITORY = 'READ_COMPANY_REPOSITORY';
+export const READ_COMPANY_REPOSITORY_INTERFACE =
+  'READ_COMPANY_REPOSITORY_INTERFACE';
 
 export interface ReadCompanyRepositoryInterface {
   findById(id: string): Promise<CompanyRecord | null>;

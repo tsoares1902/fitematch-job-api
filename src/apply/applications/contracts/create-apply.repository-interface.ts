@@ -1,7 +1,8 @@
-import type { Apply } from './apply.interface';
-import type { ApplyRecord } from './apply-record.interface';
+import type { Apply } from '@src/apply/applications/contracts/apply.interface';
+import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
-export const CREATE_APPLY_REPOSITORY = 'CREATE_APPLY_REPOSITORY';
+export const CREATE_APPLY_REPOSITORY_INTERFACE =
+  'CREATE_APPLY_REPOSITORY_INTERFACE';
 
 export interface CreateApplyRepositoryInterface {
   create(data: Apply): Promise<ApplyRecord>;

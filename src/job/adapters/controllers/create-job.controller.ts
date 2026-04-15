@@ -11,7 +11,7 @@ import { CreateJobDto } from '@src/job/adapters/dto/create-job.dto';
 import { CreateJobResponseDto } from '@src/job/adapters/dto/responses/create-job.response.dto';
 import type { Job } from '@src/job/applications/contracts/job.interface';
 import {
-  CREATE_JOB_USE_CASE,
+  CREATE_JOB_USE_CASE_INTERFACE,
   type CreateJobUseCaseInterface,
 } from '@src/job/applications/contracts/create-job.use-case-interface';
 
@@ -19,7 +19,7 @@ import {
 @Controller('job')
 export class CreateJobController {
   constructor(
-    @Inject(CREATE_JOB_USE_CASE)
+    @Inject(CREATE_JOB_USE_CASE_INTERFACE)
     private readonly createJobUseCase: CreateJobUseCaseInterface,
   ) {}
 

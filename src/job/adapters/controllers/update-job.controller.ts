@@ -12,7 +12,7 @@ import { UpdateJobDto } from '@src/job/adapters/dto/update-job.dto';
 import { UpdateJobResponseDto } from '@src/job/adapters/dto/responses/update-job.response.dto';
 import type { Job } from '@src/job/applications/contracts/job.interface';
 import {
-  UPDATE_JOB_USE_CASE,
+  UPDATE_JOB_USE_CASE_INTERFACE,
   type UpdateJobUseCaseInterface,
 } from '@src/job/applications/contracts/update-job.use-case-interface';
 
@@ -20,7 +20,7 @@ import {
 @Controller('job')
 export class UpdateJobController {
   constructor(
-    @Inject(UPDATE_JOB_USE_CASE)
+    @Inject(UPDATE_JOB_USE_CASE_INTERFACE)
     private readonly updateJobUseCase: UpdateJobUseCaseInterface,
   ) {}
 

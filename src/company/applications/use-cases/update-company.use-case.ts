@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  UPDATE_COMPANY_REPOSITORY,
+  UPDATE_COMPANY_REPOSITORY_INTERFACE,
   type UpdateCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/update-company.repository-interface';
 import type { UpdateCompanyUseCaseInterface } from '@src/company/applications/contracts/update-company.use-case-interface';
@@ -10,7 +10,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Injectable()
 export class UpdateCompanyUseCase implements UpdateCompanyUseCaseInterface {
   constructor(
-    @Inject(UPDATE_COMPANY_REPOSITORY)
+    @Inject(UPDATE_COMPANY_REPOSITORY_INTERFACE)
     private readonly updateCompanyRepository: UpdateCompanyRepositoryInterface,
   ) {}
 

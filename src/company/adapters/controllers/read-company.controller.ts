@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { ReadCompanyResponseDto } from '@src/company/adapters/dto/responses/read-company.response.dto';
 import {
-  READ_COMPANY_USE_CASE,
+  READ_COMPANY_USE_CASE_INTERFACE,
   type ReadCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/read-company.use-case-interface';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
@@ -17,7 +17,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Controller('company')
 export class ReadCompanyController {
   constructor(
-    @Inject(READ_COMPANY_USE_CASE)
+    @Inject(READ_COMPANY_USE_CASE_INTERFACE)
     private readonly readCompanyUseCase: ReadCompanyUseCaseInterface,
   ) {}
 

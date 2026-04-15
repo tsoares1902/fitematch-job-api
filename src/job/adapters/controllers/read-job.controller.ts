@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { ReadJobResponseDto } from '@src/job/adapters/dto/responses/read-job.response.dto';
 import {
-  READ_JOB_USE_CASE,
+  READ_JOB_USE_CASE_INTERFACE,
   type ReadJobUseCaseInterface,
 } from '@src/job/applications/contracts/read-job.use-case-interface';
 
@@ -16,7 +16,7 @@ import {
 @Controller('job')
 export class ReadJobController {
   constructor(
-    @Inject(READ_JOB_USE_CASE)
+    @Inject(READ_JOB_USE_CASE_INTERFACE)
     private readonly readJobUseCase: ReadJobUseCaseInterface,
   ) {}
 

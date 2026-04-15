@@ -9,7 +9,7 @@ import {
 import { ReadApplyResponseDto } from '@src/apply/adapters/dto/responses/read-apply.response.dto';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
-  READ_APPLY_USE_CASE,
+  READ_APPLY_USE_CASE_INTERFACE,
   type ReadApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/read-apply.use-case-interface';
 
@@ -17,7 +17,7 @@ import {
 @Controller('apply')
 export class ReadApplyController {
   constructor(
-    @Inject(READ_APPLY_USE_CASE)
+    @Inject(READ_APPLY_USE_CASE_INTERFACE)
     private readonly readApplyUseCase: ReadApplyUseCaseInterface,
   ) {}
 

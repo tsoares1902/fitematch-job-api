@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  CREATE_APPLY_REPOSITORY,
+  CREATE_APPLY_REPOSITORY_INTERFACE,
   type CreateApplyRepositoryInterface,
 } from '@src/apply/applications/contracts/create-apply.repository-interface';
 import type { CreateApplyUseCaseInterface } from '@src/apply/applications/contracts/create-apply.use-case-interface';
@@ -10,7 +10,7 @@ import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record
 @Injectable()
 export class CreateApplyUseCase implements CreateApplyUseCaseInterface {
   constructor(
-    @Inject(CREATE_APPLY_REPOSITORY)
+    @Inject(CREATE_APPLY_REPOSITORY_INTERFACE)
     private readonly createApplyRepository: CreateApplyRepositoryInterface,
   ) {}
 

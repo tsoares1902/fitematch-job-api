@@ -10,7 +10,7 @@ import { CreateApplyDto } from '@src/apply/adapters/dto/create-apply.dto';
 import { CreateApplyResponseDto } from '@src/apply/adapters/dto/responses/create-apply.response.dto';
 import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 import {
-  CREATE_APPLY_USE_CASE,
+  CREATE_APPLY_USE_CASE_INTERFACE,
   type CreateApplyUseCaseInterface,
 } from '@src/apply/applications/contracts/create-apply.use-case-interface';
 import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.enum';
@@ -19,7 +19,7 @@ import { ApplyStatusEnum } from '@src/apply/applications/contracts/apply-status.
 @Controller('apply')
 export class CreateApplyController {
   constructor(
-    @Inject(CREATE_APPLY_USE_CASE)
+    @Inject(CREATE_APPLY_USE_CASE_INTERFACE)
     private readonly createApplyUseCase: CreateApplyUseCaseInterface,
   ) {}
 

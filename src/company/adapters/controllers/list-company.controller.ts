@@ -2,7 +2,7 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ListCompanyResponseDto } from '@src/company/adapters/dto/responses/list-company.response.dto';
 import {
-  LIST_COMPANY_USE_CASE,
+  LIST_COMPANY_USE_CASE_INTERFACE,
   type ListCompanyUseCaseInterface,
 } from '@src/company/applications/contracts/list-company.use-case-interface';
 import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
@@ -11,7 +11,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Controller('company')
 export class ListCompanyController {
   constructor(
-    @Inject(LIST_COMPANY_USE_CASE)
+    @Inject(LIST_COMPANY_USE_CASE_INTERFACE)
     private readonly listCompanyUseCase: ListCompanyUseCaseInterface,
   ) {}
 

@@ -1,6 +1,7 @@
-import type { ApplyRecord } from './apply-record.interface';
+import type { ApplyRecord } from '@src/apply/applications/contracts/apply-record.interface';
 
-export const READ_APPLY_REPOSITORY = 'READ_APPLY_REPOSITORY';
+export const READ_APPLY_REPOSITORY_INTERFACE =
+  'READ_APPLY_REPOSITORY_INTERFACE';
 
 export interface ReadApplyRepositoryInterface {
   findById(id: string): Promise<ApplyRecord | null>;

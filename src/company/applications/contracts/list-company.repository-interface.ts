@@ -1,6 +1,7 @@
-import type { CompanyRecord } from './company-record.interface';
+import type { CompanyRecord } from '@src/company/applications/contracts/company-record.interface';
 
-export const LIST_COMPANY_REPOSITORY = 'LIST_COMPANY_REPOSITORY';
+export const LIST_COMPANY_REPOSITORY_INTERFACE =
+  'LIST_COMPANY_REPOSITORY_INTERFACE';
 
 export interface ListCompanyRepositoryInterface {
   list(): Promise<CompanyRecord[]>;

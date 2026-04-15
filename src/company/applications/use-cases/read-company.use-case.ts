@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  READ_COMPANY_REPOSITORY,
+  READ_COMPANY_REPOSITORY_INTERFACE,
   type ReadCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/read-company.repository-interface';
 import type { ReadCompanyUseCaseInterface } from '@src/company/applications/contracts/read-company.use-case-interface';
@@ -9,7 +9,7 @@ import type { CompanyRecord } from '@src/company/applications/contracts/company-
 @Injectable()
 export class ReadCompanyUseCase implements ReadCompanyUseCaseInterface {
   constructor(
-    @Inject(READ_COMPANY_REPOSITORY)
+    @Inject(READ_COMPANY_REPOSITORY_INTERFACE)
     private readonly readCompanyRepository: ReadCompanyRepositoryInterface,
   ) {}
 

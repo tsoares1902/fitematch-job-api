@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  LIST_COMPANY_REPOSITORY,
+  LIST_COMPANY_REPOSITORY_INTERFACE,
   type ListCompanyRepositoryInterface,
 } from '@src/company/applications/contracts/list-company.repository-interface';
 import type { ReadCompanyResponseDto } from '@src/company/adapters/dto/responses/read-company.response.dto';
@@ -27,7 +27,7 @@ export class ListJobUseCase implements ListJobUseCaseInterface {
   constructor(
     @Inject(LIST_JOB_REPOSITORY_INTERFACE)
     listJobRepository: ListJobRepositoryInterface,
-    @Inject(LIST_COMPANY_REPOSITORY)
+    @Inject(LIST_COMPANY_REPOSITORY_INTERFACE)
     listCompanyRepository: ListCompanyRepositoryInterface,
     /* c8 ignore next */
     metadataUtils: MetadataUtils,
