@@ -1,88 +1,171 @@
-## fitematch-job-api
+# fitematch-job-api
 
-REST API for manage users registrations, autentications and sessions.
+Job service for the **fitematch**, responsible for user registration, authentication and session management.
 
-- Content:
-    - [Stack](#stack)
-    - [Installation](#installation)
-    - [Running](#running)
-    - [Tests](#tests)
+---
 
-## Stack <a name="stack"></a>
+## Overview
 
-- Stack:
-  - [Node.js](https://nodejs.org/)
-  - [NestJS](https://nestjs.com/)
-  - [TypeScript](https://www.typescriptlang.org/)
-  - [MongoDB](https://www.mongodb.com/)
-  - [Mongoose](https://mongoosejs.com/)
-  - [Jest](https://jestjs.io/)
+The Job API is part of a modular backend ecosystem designed to support a job platform for fitness professionals.
 
-## Installation <a name="installation"></a>
+It handles:
 
-Clone GIT repository.
+- Companies registrations.
+- Job applications management.
 
-```bash
-# Using SSL method.
-$ git clone git@github.com:tsoares1902/fitematch-job-api.git
-```
+---
 
-Access workdir of application:
+## Architecture
 
-```bash
-$ cd fitematch-job-api.git/
-```
-
-Make a copy of .env.example for .env. 
-
-```bash
-# Copy file.
-$ cp .env.example .env
-```
-
-## Running <a name="running"></a>
-
-Make sure you have [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
-
-For create and run containers type the command.
-
-```bash
-# Up and start all application containers.
-$ docker compose up -d
-```
-
-Install Node.js dependencies with [npm](https://www.npmjs.com/):
-
-```bash
-$ docker exec job-api npm install
-```
-
-Check API documentation on /docs:
-
-```bash
-GET: http://localhost:3002/docs
-```
-
-Check MongoDB instance:
-
-```bash
-mongodb://localhost:27019/job-api
+This project follows principles inspired by **Clean Architecture**, ensuring separation of concerns and high testability.
 
 ```
-
-## Test <a name="tests"></a>
-
-For run unit tests:
-
-```bash
-# Running unit tests.
-$ docker exec job-api npm run test
+module/
+  domain/        # Business rules and entities.
+  application/   # Use cases (business logic orchestration).
+  adapters/      # External layers (controllers, persistence, etc.).
+  shared/        # Shared utilities and abstractions.
 ```
 
+---
 
-For generate code coverage for unit tests:
+## Tech Stack
 
-```bash
-# Running unit tests and generate code coverage.
-$ docker exec job-api npm run test:cov
+- **Node.js**
+- **NestJS**
+- **TypeScript**
+- **MongoDB (Mongoose)**
+- **JWT Authentication**
+- **Swagger (OpenAPI)**
+- **Docker**
+- **Jest (Unit Testing)**
+- **Husky (Git Hooks)**
+
+---
+
+## Branch Strategy
+
+- `main`: production
+- `develop`: integration
+- `feature/*`: new features
+
+Flow:
+
+- `feature/*` -> `develop` via Pull Request
+- `develop` -> `main` via Pull Request
+
+---
+
+## CI
+
+The project uses a single GitHub Actions workflow at `.github/workflows/ci.yml`.
+
+It runs on:
+
+- push to `feature/*`
+- pull requests targeting `develop`
+- pull requests targeting `main`
+
+The workflow executes:
+
+- `npm ci`
+- `npm run lint:check`
+- `npm run test`
+- `npm run build`
+
+---
+
+## Authentication
+
+Authentication is implemented using **JWT (JSON Web Tokens)**.
+
+- Stateless authentication.
+- Token-based session handling.
+- Secure route protection via guards.
+
+---
+
+## API Documentation
+
+Interactive API documentation is available via Swagger:
+
 ```
+http://localhost:3002/docs
+```
+
+---
+
+## Testing
+
+The project includes a comprehensive testing strategy focused on business logic.
+
+- Unit tests for all use cases.
+- High coverage across core logic
+
+Run tests:
+
+```
+npm run test
+```
+
+Run coverage:
+
+```
+npm run test:cov
+```
+
+---
+
+## Running with Docker
+
+Start the full environment:
+
+```
+docker-compose up -d --build
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file based on `.env.example`.
+
+Example:
+
+```
+# Application host URL:
+JOB_API_URL=http://localhost:3002
+# Host port bound to the API container:
+APPLICATION_BIND_PORT=3002
+# API container port:
+APPLICATION_PORT=3000
+# MongoDB database URI:
+DATABASE_URI=mongodb://database:27017/job-api
+# MongoDB database schema:
+DATABASE_NAME=job-api
+# MongoDB host bind port:
+DATABASE_BIND_PORT=27019
+# MongoDB container port:
+DATABASE_PORT=27017
+```
+
+---
+
+## Responsibilities
+
+This service is responsible for:
+
+- Managing companies registrations.
+- Handling job apllications flows.
+
+---
+
+## Related Services
+
+This API is part of the FitMatch ecosystem:
+
+- `fitematch-site` → Frontend application
+- `fitematch-dashboard` → Dashboard application
+- `fitematch-identity-api` → Authentication, permissions and user management
+
+---
